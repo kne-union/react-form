@@ -1,0 +1,33 @@
+{
+  "name": "@kne/react-form",
+  "version": "0.1.0",
+  "description": "用于表单验证的react组件",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kne-union/react-form.git"
+  },
+  "keywords": [
+    "react",
+    "form",
+    "validate"
+  ],
+  "author": "linzp",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kne-union/react-form/issues"
+  },
+  "homepage": "https://github.com/kne-union/react-form#readme",
+  "peerDependencies": {
+    "prop-types": ">=15",
+    "react": ">=16",
+    "react-dom": ">=16"
+  },
+  "dependencies": {
+    "lodash.values": "^4.3.0",
+    "react": "^16.12.0"
+  }
+}
