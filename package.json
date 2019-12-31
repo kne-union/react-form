@@ -1,15 +1,24 @@
 {
   "name": "@kne/react-form",
-  "version": "0.1.0",
+  "version": "0.1.0-alpha",
   "description": "用于表单验证的react组件",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "jsnext:main": "dist/index.es.js",
+  "browser": "dist/react-form.min.js",
+  "umd": "dist/react-form.js",
   "scripts": {
-    "test": "npm test"
+    "build": "rollup -c",
+    "start-demo": "cd example&&npm start",
+    "start": "rollup -c -w"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kne-union/react-form.git"
   },
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "react",
     "form",
@@ -22,12 +31,24 @@
   },
   "homepage": "https://github.com/kne-union/react-form#readme",
   "peerDependencies": {
-    "prop-types": ">=15",
-    "react": ">=16",
-    "react-dom": ">=16"
+    "prop-types": "15.x",
+    "react": "16.x",
+    "react-dom": "16.x"
   },
   "dependencies": {
-    "lodash.values": "^4.3.0",
-    "react": "^16.12.0"
+    "@babel/runtime": "^7.7.7",
+    "fbemitter": "^2.1.1",
+    "lodash": "^4.17.15"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.7.6",
+    "@babel/preset-env": "^7.7.7",
+    "babel-preset-react-app": "^9.1.0",
+    "rollup": "^1.27.14",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-peer-deps-external": "^2.2.0",
+    "rollup-plugin-terser": "^5.1.3"
   }
 }
