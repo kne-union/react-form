@@ -1,10 +1,9 @@
 import React from 'react';
-import Form, {field, useSubmit} from './react-form';
+import Form, {field, submit} from '@kne/react-form';
 
-const SubmitButton = ({children}) => {
-    const {onClick: handlerClick, isLoading} = useSubmit();
+const SubmitButton = submit(({children, onClick: handlerClick, isLoading}) => {
     return <button disabled={isLoading} onClick={handlerClick}>{children}</button>
-};
+});
 
 const Input = field(({label, onChange, value, triggerValidate, errorState, errorMsg}) => {
     return <>
@@ -18,9 +17,9 @@ export default () => {
     return <Form debug rules={{
         EXIT: (value) => {
             return new Promise((resolve) => {
-                setTimeout(()=>{
-                    resolve({result:true});
-                },3000);
+                setTimeout(() => {
+                    resolve({result: true});
+                }, 3000);
             });
         }
     }} onSubmit={(data) => {
