@@ -1,20 +1,25 @@
 import React, {useState, useRef, useCallback, useImperativeHandle, forwardRef, useEffect} from 'react';
+import PropTypes from 'prop-types';
 import {Provider} from './context';
 import useEvent from './useEvent';
 import getFieldInfo from './util/getFieldInfo';
 import getValues from 'lodash/values';
+import useFormValue from './useFormValue';
 
-const Form = function (props, ref) {
+const Form = forwardRef((props, ref) => {
     const {onPrevSubmit, onError, onSubmit, debug} = props;
-    const [formValue, setFormValue] = useState(Object.assign({}, props.data)),
+    const [formValue, setFormValue, cleanCache] = useFormValue({data: props.data, cache: props.cache}),
         [isPass, setIsPass] = useState(false),
         fieldList = useRef({});
 
     const emitter = useEvent(debug);
 
-    const validateFields = useCallback(async (isForce = false, fields = []) => {
-        let isPass = true;
-        await Promise.all(Object.keys(fieldList.current).map(async (name) => {
+    const validateFields = useCallback(async ({isForce, fields}) => {
+        let isPass = true, targetFieldList = Object.keys(fieldList.current);
+        if (fields && fields.length > 0) {
+            targetFieldList = fields;
+        }
+        await Promise.all(targetFieldList.map(async (name) => {
             const {field, info} = fieldList.current[name];
             if (isForce) {
                 const res = fieldList.current[name].info = await field.current.checkValidate(formValue[name]);
@@ -25,12 +30,14 @@ const Form = function (props, ref) {
                 isPass = false;
             }
         }));
-
+        emitter.emit('check', isPass, {fields, isForce});
         return isPass;
-    }, [formValue]);
+    }, [formValue, emitter]);
 
     const checkPass = useCallback(async (isForce = false) => {
-        const isPass = await validateFields(isForce, Object.keys(fieldList.current));
+        const isPass = await validateFields({
+            isForce, fields: Object.keys(fieldList.current)
+        });
         setIsPass(isPass);
         return isPass;
     }, [validateFields, setIsPass]);
@@ -56,9 +63,13 @@ const Form = function (props, ref) {
         fieldList.current[name].field.current.setError(error);
     }, []);
 
+    const getValidateInfo = useCallback(() => {
+        return getFieldInfo(fieldList.current);
+    }, []);
+
     const submit = useCallback(async () => {
         const isPass = await checkPass(true);
-        const validateInfo = getFieldInfo(fieldList.current);
+        const validateInfo = getValidateInfo();
         onPrevSubmit && onPrevSubmit(isPass, validateInfo, formValue);
         emitter.emit('prev-submit', isPass, validateInfo, formValue);
         if (!isPass) {
@@ -68,15 +79,35 @@ const Form = function (props, ref) {
         }
         await onSubmit && onSubmit(formValue);
         emitter.emit('submit', formValue);
+        cleanCache();
         return isPass;
-    }, [formValue, onError, onPrevSubmit, onSubmit, checkPass, emitter]);
+    }, [formValue, onError, onPrevSubmit, onSubmit, checkPass, emitter, cleanCache, getValidateInfo]);
 
     useEffect(() => {
         emitter.emit('pass-change', isPass);
     }, [isPass, emitter]);
 
     useImperativeHandle(ref, () => {
-        return {data: formValue, isPass, submit, reset, setData: setFormValue, setError, validateFields, fieldList};
+        const api = {
+            data: formValue,
+            isPass,
+            submit,
+            reset,
+            setData: setFormValue,
+            getData() {
+                return Object.assign({}, formValue);
+            },
+            setError,
+            validateFields,
+            getFieldList: () => {
+                return fieldList.current;
+            }
+        };
+        Object.defineProperty(api, 'data', {
+            get: api.getData,
+            set: api.setData
+        });
+        return api;
     });
 
     return (
@@ -84,6 +115,7 @@ const Form = function (props, ref) {
             data: formValue,
             setData: setFormValue,
             setFieldValue,
+            getValidateInfo,
             rules: props.rules,
             emitter,
             setError,
@@ -91,6 +123,17 @@ const Form = function (props, ref) {
             props
         }}>{props.children}</Provider>
     );
+});
+
+
+Form.propTypes = {
+    data: PropTypes.object,
+    cache: PropTypes.string,
+    rules: PropTypes.object,
+    onSubmit: PropTypes.func,
+    onPrevSubmit: PropTypes.func,
+    onError: PropTypes.func,
+    onValidate: PropTypes.func
 };
 
-export default forwardRef(Form);
+export default Form;

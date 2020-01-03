@@ -14,7 +14,7 @@ const Input = field(({label, onChange, value, triggerValidate, errorState, error
 });
 
 export default () => {
-    return <Form debug rules={{
+    return <Form cache="test-form" debug rules={{
         EXIT: (value) => {
             return new Promise((resolve) => {
                 setTimeout(() => {
@@ -22,7 +22,7 @@ export default () => {
                 }, 3000);
             });
         }
-    }} onSubmit={(data) => {
+    }} data={{name:'18728377283'}} onSubmit={(data) => {
         console.log(data);
         return new Promise((resolve) => {
             setTimeout(() => {
@@ -31,6 +31,7 @@ export default () => {
         });
     }}>
         <Input name="name" label="姓名" rule="REQ TEL EXIT"/>
+        <Input name="pwd" label="密码" rule="REQ"/>
         <SubmitButton>提交</SubmitButton>
     </Form>
 };

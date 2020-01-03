@@ -1,7 +1,7 @@
 import {useState, useRef, useEffect, useCallback} from 'react';
 import useApi from './useApi';
 
-export default (callback) => {
+export default ({onClick, ...props}) => {
     const [isLoading, setIsLoading] = useState(false),
         isUnmount = useRef(false);
     const {submit, isPass} = useApi();
@@ -16,7 +16,7 @@ export default (callback) => {
         if (isLoading) {
             return;
         }
-        callback && callback();
+        onClick && onClick();
         setIsLoading(true);
         submit().catch((e) => {
             console.error(e);
@@ -24,7 +24,7 @@ export default (callback) => {
             !isUnmount.current && setIsLoading(false);
         });
 
-    }, [submit, isLoading, setIsLoading, callback]);
+    }, [submit, isLoading, setIsLoading, onClick]);
 
-    return {isPass, isLoading, onClick: handlerClick};
+    return {...props, isPass, isLoading, onClick: handlerClick};
 };

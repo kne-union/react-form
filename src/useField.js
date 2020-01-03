@@ -30,8 +30,9 @@ export default (fieldProps) => {
         msg: ''
     });
     const {onFieldInstall, onFieldUninstall, onValidateChange} = useFieldRegister();
-    const {props, setFieldValue, emitter, data} = useContext(context), {rules} = props;
+    const {rules, setFieldValue, emitter, data} = useContext(context);
     const orderPromise = useRef(new OrderPromise());
+    const fieldRef = useRef({});
     const fieldValue = data[name];
 
     const validate = useCallback((value) => {
@@ -60,7 +61,6 @@ export default (fieldProps) => {
         const res = await validate(newValue);
 
         orderPromise.current.clean();
-        emitter.emit(`${name}-check`, res);
         if (res && res.hasOwnProperty('result')) {
             let errorMsg = '';
 
@@ -75,7 +75,9 @@ export default (fieldProps) => {
                 });
             }
 
-            return {result: res.result, errMsg: errorMsg};
+            const output = {result: res.result, errMsg: errorMsg};
+            emitter.emit(`${name}-check`, output);
+            return output;
         } else {
             //重置为初始化状态
             return {};
@@ -116,11 +118,11 @@ export default (fieldProps) => {
 
     useImperativeHandle(api, () => {
         return {
-            name,
-            value,
+            ...fieldProps,
             validate,
             checkValidate,
             reset,
+            fieldRef,
             setError: setFieldError
         };
     });
@@ -136,21 +138,27 @@ export default (fieldProps) => {
     });
 
     useEffect(() => {
+        //如果该字段初始化或正在校验中，不触发form检查
+        if ([0, 3].indexOf(error.state) > -1) {
+            return;
+        }
+
         onValidateChange(name, {
             result: error.state === 1,
             errorMsg: error.msg
         });
-    }, [error, onValidateChange, name]);
+    }, [error.state, error.msg, onValidateChange, name]);
 
-    useEffect(()=>{
-        emitter.emit(`${name}-validate-change`, error);
-    },[error]);
+    useEffect(() => {
+        emitter.emit(`${name}-validate-change`, {state: error.state, msg: error.msg});
+    }, [error.msg, error.state]);
 
     return {
         ...args,
         name, label,
         onChange: handlerChange,
         value: fieldValue,
+        fieldRef,
         triggerValidate: checkValidate,
         errorState: error.state,
         errorMsg: error.msg

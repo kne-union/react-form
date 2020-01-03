@@ -3,23 +3,29 @@ import context from './context';
 import getFieldInfo from './util/getFieldInfo';
 
 export default () => {
-    const {data, setData, fieldList, setFieldValue, checkPass, props} = useContext(context);
+    const {data, setData, fieldList, setFieldValue, checkPass, emitter, props} = useContext(context);
     const {onValidate} = props;
     const onFieldInstall = useCallback((field) => {
-        const {name, value} = field.current;
+        const {name, value, validate} = field.current,
+            dataIsInit = data.hasOwnProperty(name);
+        let fieldValue;
+        if (dataIsInit) {
+            fieldValue = data[name];
+        }
         fieldList.current[name] = {
             field, info: {}
         };
 
-        if (field.current.value) {
+        if (!dataIsInit && value) {
             setFieldValue(name, value);
+            fieldValue = value;
         }
 
-        field.current.validate(value || data[name]).then((res) => {
+        fieldValue !== undefined && validate(fieldValue).then((res) => {
             if (res.result === true) {
                 fieldList.current[name].info = {result: true};
+                return checkPass();
             }
-            return checkPass();
         });
     }, [setFieldValue, checkPass, data, fieldList]);
 
@@ -33,7 +39,8 @@ export default () => {
         fieldList.current[name].info = res;
         const pass = await checkPass(), validateInfo = getFieldInfo(fieldList.current);
         onValidate && onValidate(pass, validateInfo, data);
-    }, [fieldList, data, onValidate, checkPass]);
+        emitter.emit('validate', pass, validateInfo, data);
+    }, [fieldList, data, onValidate, checkPass, emitter]);
 
     return {
         onFieldInstall, onFieldUninstall, onValidateChange
