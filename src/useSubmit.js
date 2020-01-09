@@ -12,11 +12,11 @@ export default ({onClick, ...props}) => {
         }
     }, []);
 
-    const handlerClick = useCallback(() => {
+    const handlerClick = useCallback((e) => {
         if (isLoading) {
             return;
         }
-        onClick && onClick();
+        onClick && onClick(e);
         setIsLoading(true);
         submit().catch((e) => {
             console.error(e);
