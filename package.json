@@ -1,7 +1,6 @@
 {
   "name": "@kne/react-form",
   "version": "0.1.0",
-
   "description": "用于表单验证的react组件",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
