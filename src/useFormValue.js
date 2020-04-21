@@ -1,4 +1,5 @@
 import {useState, useMemo, useEffect, useCallback} from 'react';
+import useCallbackState from '@kne/use-callback-state';
 import merge from 'lodash/merge';
 import get from 'lodash/get';
 
@@ -22,7 +23,7 @@ const parse = (str) => {
 
 
 export default ({data, format, cache}) => {
-    const [value, setValue] = useState(merge({}, data, cache ? parse(window.localStorage.getItem(cache)) : {}));
+    const [value, setValue] = useCallbackState(merge({}, data, cache ? parse(window.localStorage.getItem(cache)) : {}));
     useEffect(() => {
         if (cache) {
             window.localStorage.setItem(cache, stringify(value));
@@ -33,13 +34,13 @@ export default ({data, format, cache}) => {
         window.localStorage.removeItem(cache);
     }, [cache]);
 
-    const setFormatValue = useCallback((value) => {
+    const setFormatValue = useCallback((value, callback) => {
         const input = get(format, 'input');
         if (typeof input === 'function') {
             value = input(value);
         }
 
-        setValue(value);
+        setValue(value, callback);
     }, [setValue]);
 
     const outputValue = useMemo(() => {

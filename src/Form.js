@@ -43,20 +43,22 @@ const Form = forwardRef((props, ref) => {
     }, [validateFields, setIsPass]);
 
     const setFieldValue = useCallback((name, value) => {
-        const newData = Object.assign({}, formValue, {[name]: value});
-        setFormValue(newData);
-        emitter.emit('change', newData);
-    }, [formValue, setFormValue, emitter]);
+        setFormValue((formValue) => {
+            return Object.assign({}, formValue, {[name]: value});
+        },(data)=>{
+            emitter.emit('change', data);
+        });
+    }, [setFormValue, emitter]);
 
     const reset = useCallback(() => {
-        getValues(fieldList.current).forEach((item) => {
-            item.info = {};
-            item.field.current.reset();
+        setFormValue({}, () => {
+            getValues(fieldList.current).forEach((item) => {
+                item.info = {};
+                item.field.current.reset();
+            });
+            emitter.emit('reset');
         });
-
-        setFormValue({});
         setIsPass(false);
-        emitter.emit('reset');
     }, [setFormValue, setIsPass, emitter]);
 
     const setError = useCallback((name, error = {result: true, errMsg: ''}) => {

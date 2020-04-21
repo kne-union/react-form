@@ -5,6 +5,7 @@ import OrderPromise from './util/OrderPromise';
 import runValidate from './util/validate';
 import getFieldValue from './util/getFieldValue';
 import compileErrMsg from './util/compileErrMsg';
+import {useDebouncedCallback} from 'use-debounce';
 import context from './context';
 
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -24,7 +25,7 @@ const useWillUnmount = (callback) => {
 /* eslint-disable react-hooks/exhaustive-deps */
 
 export default (fieldProps) => {
-    const {name, label, value, noTrim, rule, onChange, errMsg, ...args} = fieldProps;
+    const {name, label, debounce: time = 0, value, noTrim, rule, onChange, errMsg, ...args} = fieldProps;
     const [error, setError] = useState({
         state: 0,
         msg: ''
@@ -84,6 +85,8 @@ export default (fieldProps) => {
         }
     }, [fieldValue, noTrim, setFieldValue, validate, label, name]);
 
+    const [debouncedCheckValidate, cancel] = useDebouncedCallback(checkValidate, time);
+
     const handlerChange = useCallback((event, value) => {
         setFieldValue(name, getFieldValue(event, value));
         onChange && onChange(event, value);
@@ -93,12 +96,14 @@ export default (fieldProps) => {
     const reset = useCallback(() => {
         //如果有远程校验，取消其返回结果
         orderPromise.current.add(Promise.resolve());
+        //取消截流函数执行
+        cancel();
         setError({
             state: 0,
             msg: ''
         });
         emitter.emit(`${name}-reset`);
-    }, [setError]);
+    }, [setError, cancel]);
 
     const setFieldError = useCallback((res) => {
         if (res.result) {
@@ -159,7 +164,7 @@ export default (fieldProps) => {
         onChange: handlerChange,
         value: fieldValue,
         fieldRef,
-        triggerValidate: checkValidate,
+        triggerValidate: time ? debouncedCheckValidate : checkValidate,
         errorState: error.state,
         errorMsg: error.msg
     };

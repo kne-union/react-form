@@ -38,7 +38,7 @@ export default [
                 sourcemap: true
             },
             {
-                file: pkg.browser,
+                file: pkg['umd:min'],
                 name: "ReactForm",
                 format: 'umd',
                 sourcemap: true,
