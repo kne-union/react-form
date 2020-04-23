@@ -79,7 +79,7 @@ const Form = forwardRef((props, ref) => {
             emitter.emit('error', validateInfo, formValue);
             return isPass;
         }
-        await onSubmit && onSubmit(formValue);
+        onSubmit && await onSubmit(formValue);
         emitter.emit('submit', formValue);
         cleanCache();
         return isPass;
