@@ -10,7 +10,8 @@
   "scripts": {
     "build": "rollup -c",
     "start-demo": "cd example&&npm start",
-    "start": "rollup -c -w"
+    "start": "rollup -c -w",
+    "prettier": "prettier --config .prettierrc --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss,md}'"
   },
   "repository": {
     "type": "git",
@@ -30,6 +31,17 @@
     "url": "https://github.com/kne-union/react-form/issues"
   },
   "homepage": "https://github.com/kne-union/react-form#readme",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --config .prettierrc --write",
+      "git add"
+    ]
+  },
   "peerDependencies": {
     "prop-types": "15.x",
     "react": "16.x",
@@ -46,6 +58,8 @@
     "@babel/plugin-transform-runtime": "^7.7.6",
     "@babel/preset-env": "^7.7.7",
     "babel-preset-react-app": "^9.1.0",
+    "husky": "^4.2.5",
+    "prettier": "^2.0.5",
     "rollup": "^1.27.14",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^10.1.0",

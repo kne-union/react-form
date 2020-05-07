@@ -1,6 +1,6 @@
-import {useContext} from 'react';
+import { useContext } from 'react';
 import context from './context';
 
 export default () => {
-    return useContext(context);
+  return useContext(context);
 };
