@@ -35,7 +35,8 @@ export default () => {
   );
 
   const onFieldUninstall = useCallback(
-    name => {
+    field => {
+      const { name } = field.current;
       delete fieldList.current[name];
       delete data[name];
       setData(data);

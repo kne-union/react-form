@@ -1,4 +1,4 @@
-import { useState, useEffect, useImperativeHandle, useCallback, useContext, useRef } from 'react';
+import { useState, useEffect, useCallback, useContext, useRef } from 'react';
 import useFieldRegister from './useFieldRegister';
 import RULES from './util/RULES';
 import OrderPromise from './util/OrderPromise';
@@ -8,7 +8,6 @@ import compileErrMsg from './util/compileErrMsg';
 import { useDebouncedCallback } from 'use-debounce';
 import context from './context';
 
-/* eslint-disable react-hooks/exhaustive-deps */
 const useDidMount = callback => {
   useEffect(() => {
     return callback();
@@ -22,7 +21,6 @@ const useWillUnmount = callback => {
     };
   }, []);
 };
-/* eslint-disable react-hooks/exhaustive-deps */
 
 export default fieldProps => {
   const { name, label, debounce: time = 0, value, noTrim, rule, onChange, errMsg, ...args } = fieldProps;
@@ -138,27 +136,31 @@ export default fieldProps => {
     [setError, label]
   );
 
-  const api = useRef({});
+  const api = useRef({}),
+    fieldRegister = useRef({});
 
-  useImperativeHandle(api, () => {
-    return {
-      ...fieldProps,
-      validate,
-      checkValidate,
-      reset,
-      fieldRef,
-      setError: setFieldError
-    };
-  });
+  api.current = {
+    ...fieldProps,
+    validate,
+    checkValidate,
+    reset,
+    fieldRef,
+    setError: setFieldError
+  };
+
+  fieldRegister.current = {
+    onFieldInstall,
+    onFieldUninstall
+  };
 
   useDidMount(() => {
-    onFieldInstall(api);
-    emitter.emit(`${name}-mount`, api);
+    fieldRegister.current.onFieldInstall(api);
+    emitter.emit(`${api.current.name}-mount`, api.current);
   });
 
   useWillUnmount(() => {
-    onFieldUninstall(api);
-    emitter.emit(`${name}-unmount`, api);
+    fieldRegister.current.onFieldUninstall(api);
+    emitter.emit(`${api.current.name}-unmount`, api.current);
   });
 
   useEffect(() => {
