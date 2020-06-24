@@ -23,13 +23,17 @@ export default () => {
         fieldValue = value;
       }
 
-      fieldValue !== undefined &&
-        validate(fieldValue).then(res => {
-          if (res.result === true) {
-            fieldList.current[name].info = { result: true };
-            return checkPass();
-          }
-        });
+      Promise.resolve(
+        fieldValue !== undefined &&
+          validate(fieldValue).then(res => {
+            if (res.result === true && fieldList.current[name]) {
+              fieldList.current[name].info = { result: true };
+              return checkPass();
+            }
+          })
+      ).then(() => {
+        emitter.emit(`${name}-field-init-complete`);
+      });
     },
     [setFieldValue, checkPass, data, fieldList]
   );

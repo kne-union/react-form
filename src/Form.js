@@ -8,7 +8,7 @@ import useFormValue from './useFormValue';
 
 const Form = forwardRef((props, ref) => {
   const { onPrevSubmit, onError, onSubmit, debug } = props;
-  const [formValue, setFormValue, cleanCache] = useFormValue({ data: props.data, cache: props.cache }),
+  const [formValue, setFormValue, cleanCache] = useFormValue({ data: props.data, formatter: props.formatter, cache: props.cache }),
     [isPass, setIsPass] = useState(false),
     fieldList = useRef({});
 
@@ -54,14 +54,9 @@ const Form = forwardRef((props, ref) => {
 
   const setFieldValue = useCallback(
     (name, value) => {
-      setFormValue(
-        formValue => {
-          return Object.assign({}, formValue, { [name]: value });
-        },
-        data => {
-          emitter.emit('change', data);
-        }
-      );
+      setFormValue(Object.assign({}, formValue, { [name]: value }), data => {
+        emitter.emit('change', data);
+      });
     },
     [setFormValue, emitter]
   );
