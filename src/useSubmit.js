@@ -1,34 +1,29 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
-import useApi from './useApi';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useFormContext } from './context';
+import { computedIsPass } from './util';
 
-export default ({ onClick, ...props }) => {
-  const [isLoading, setIsLoading] = useState(false),
-    isUnmount = useRef(false);
-  const { submit, isPass } = useApi();
-
+const useSubmit = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const { formState, emitter } = useFormContext();
+  const isPass = useMemo(() => {
+    return computedIsPass(formState);
+  }, [formState]);
   useEffect(() => {
+    const target = emitter.addListener('form-submit-complete', () => {
+      setIsLoading(false);
+    });
     return () => {
-      isUnmount.current = true;
+      target && target.remove();
     };
-  }, []);
-
-  const handlerClick = useCallback(
-    e => {
-      if (isLoading) {
-        return;
-      }
-      onClick && onClick(e);
+  }, [emitter]);
+  return {
+    isLoading,
+    isPass,
+    onClick: useCallback(() => {
       setIsLoading(true);
-      submit()
-        .catch(e => {
-          console.error(e);
-        })
-        .then(() => {
-          !isUnmount.current && setIsLoading(false);
-        });
-    },
-    [submit, isLoading, setIsLoading, onClick]
-  );
-
-  return { ...props, isPass, isLoading, onClick: handlerClick };
+      emitter.emit('form-submit');
+    }, [emitter, setIsLoading])
+  };
 };
+
+export default useSubmit;

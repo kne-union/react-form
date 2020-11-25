@@ -1,17 +1,13 @@
 import { useCallback } from 'react';
-import useApi from './useApi';
+import { useFormContext } from './context';
 
-export default ({ onClick, ...props }) => {
-  const { reset } = useApi();
-  const handlerClick = useCallback(
-    (...args) => {
-      onClick && onClick(...args);
-      reset();
-    },
-    [onClick, reset]
-  );
+const useReset = () => {
+  const { emitter } = useFormContext();
   return {
-    ...props,
-    onClick: handlerClick
+    onClick: useCallback(() => {
+      emitter.emit('form-data-reset');
+    }, [emitter])
   };
 };
+
+export default useReset;

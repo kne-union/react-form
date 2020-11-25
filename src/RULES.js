@@ -21,21 +21,18 @@ const RULES = {
     };
   },
   TEL: function (value) {
-    if (!RULES.REQ(value).result) return { result: true, errMsg: '' };
     return {
       result: /^1[0-9]{10}$/.test(value),
       errMsg: '请输入有效的手机号'
     };
   },
   EMAIL: function (value) {
-    if (!RULES.REQ(value).result) return { result: true, errMsg: '' };
     return {
       result: /^([a-zA-Z0-9_.-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(value),
       errMsg: '请输入有效的邮箱'
     };
   },
   LEN: function (value, start, end) {
-    if (!RULES.REQ(value).result) return { result: true, errMsg: '' };
     value = value.toString();
     if (end === start && value.length !== Number(end)) {
       return {

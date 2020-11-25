@@ -1,6 +1,10 @@
-import isEvent from './isEvent';
+import get from 'lodash/get';
 
-export default (event, value) => {
+const isEvent = event => {
+  return event instanceof window.Event || get(event, 'nativeEvent') instanceof window.Event || typeof get(event, 'preventDefault') === 'function';
+};
+
+const getFieldValue = (event, value) => {
   if (isEvent(event)) {
     if (value === undefined) {
       switch (event.target.type) {
@@ -17,3 +21,5 @@ export default (event, value) => {
   }
   return value;
 };
+
+export default getFieldValue;

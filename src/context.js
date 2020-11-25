@@ -1,7 +1,7 @@
-import { createContext } from 'react';
+import { createContext, useContext } from 'react';
 
 const context = createContext({});
 
-export const { Provider, Consumer } = context;
-
 export default context;
+export const { Provider, Consumer } = context;
+export const useFormContext = () => useContext(context);

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import fbemitter from 'fbemitter';
 
 const { EventEmitter } = fbemitter;
@@ -10,20 +10,25 @@ class FormEventEmitter extends EventEmitter {
   }
 
   emit(...args) {
-    super.emit(...args);
     if (this.debug) {
-      console.log(...args);
+      console.log('[react-form][debug]:', ...args);
     }
+    super.emit(...args);
   }
 }
 
-export default debug => {
-  const emitter = useRef(new FormEventEmitter(debug));
-  return {
-    addListener: (...args) => emitter.current.addListener(...args),
-    emit: (...args) => emitter.current.emit(...args),
-    removeAllListeners: (...args) => emitter.current.removeAllListeners(...args),
-    listeners: (...args) => emitter.current.listeners(...args),
-    once: (...args) => emitter.current.once(...args)
-  };
+const useEvent = debug => {
+  const debugRef = useRef(debug);
+  return useMemo(() => {
+    const emitter = new FormEventEmitter(debugRef.current);
+    return {
+      addListener: (...args) => emitter.addListener(...args),
+      emit: (...args) => emitter.emit(...args),
+      removeAllListeners: (...args) => emitter.removeAllListeners(...args),
+      listeners: (...args) => emitter.listeners(...args),
+      once: (...args) => emitter.once(...args)
+    };
+  }, []);
 };
+
+export default useEvent;
