@@ -2,13 +2,15 @@ import React, { forwardRef, useImperativeHandle, useMemo, useState, useRef, useE
 import { Provider } from './context';
 import useEvent from './useEvent';
 import _get from 'lodash/get';
+import unset from 'lodash/unset';
+import cloneDeep from 'lodash/cloneDeep';
 import ruleValidate from './ruleValidate';
 import cancelablePromise from './cancelablePromise';
-import { computedFormData, parseFormData, computedIsPass, computedError } from './util';
-import { Group } from './group';
+import { getFields, computedFormData, parseFormData, computedIsPass, computedError } from './util';
+import Group from './group';
 import RULES from './RULES';
 
-const useFormStateEvent = ({ state, rules, onPrevSubmit, onError, onSubmit, debug }) => {
+const useFormStateEvent = ({ state, dataRef, rules, onPrevSubmit, onError, onSubmit, debug }) => {
   const emitter = useEvent(debug);
   const [formState, setFormState] = state;
   const formStateRef = useRef(formState);
@@ -43,7 +45,7 @@ const useFormStateEvent = ({ state, rules, onPrevSubmit, onError, onSubmit, debu
     const getFormData = () => {
       return computedFormData(formStateRef.current);
     };
-    emitter.addListener('form-field-add', ({ name, label, rule, index, groupName, groupIndex, fieldRef }) => {
+    emitter.addListener('form-field-add', ({ name, label, rule, value, index, groupName, fieldRef }) => {
       setFormState(oldState => {
         const fieldItem = Object.assign({}, oldState[name], {});
 
@@ -51,11 +53,40 @@ const useFormStateEvent = ({ state, rules, onPrevSubmit, onError, onSubmit, debu
           fieldItem.field = { name, label, rule };
           fieldItem.data = {};
         }
+        const nextIndex = Object.getOwnPropertySymbols(fieldItem.data).length;
+        const formDefaultValue =
+          value ||
+          (() => {
+            if (groupName && groupName === name) {
+              const path = `["${groupName}"]["${nextIndex}"]`;
+              const target = _get(dataRef.current, path);
+              const other = cloneDeep(dataRef.current);
+              if (Array.isArray(other[groupName])) {
+                other[groupName].splice(nextIndex, 0);
+              }
+              dataRef.current = other;
+              return target;
+            }
+
+            if (groupName) {
+              const path = `["${groupName}"]["${nextIndex}"]["${name}"]`;
+              const target = _get(dataRef.current, path);
+              const other = cloneDeep(dataRef.current);
+              unset(other, path);
+              dataRef.current = other;
+              return target;
+            }
+            return _get(dataRef.current, name);
+          })();
         fieldItem.data[index] = {
-          index: groupIndex,
+          index: nextIndex,
+          SymbolIndex: index,
           groupName,
           fieldRef
         };
+        if (formDefaultValue !== undefined) {
+          fieldItem.data[index].value = formDefaultValue;
+        }
         return Object.assign({}, oldState, {
           [name]: fieldItem
         });
@@ -67,10 +98,11 @@ const useFormStateEvent = ({ state, rules, onPrevSubmit, onError, onSubmit, debu
         const fieldItem = Object.assign({}, oldState[name]);
         if (fieldItem.data) {
           delete fieldItem.data[index];
-          if (Object.keys(fieldItem.data).length === 0) {
+          if (Object.getOwnPropertySymbols(fieldItem.data).length === 0) {
             delete state[name];
+          } else {
+            state[name] = fieldItem;
           }
-          state[name] = fieldItem;
         }
         return state;
       });
@@ -118,18 +150,20 @@ const useFormStateEvent = ({ state, rules, onPrevSubmit, onError, onSubmit, debu
         })
       );
       task.then(validate => {
+        const validateRes = {
+          status: validate.result === true ? 1 : 2,
+          msg: validate.errMsg
+        };
         setFormState(
           createSetFieldInfo({
             name,
             index,
             key: 'validate',
-            value: {
-              status: validate.result === true ? 1 : 2,
-              msg: validate.errMsg
-            }
+            value: validateRes
           })
         );
         splitTask();
+        emitter.emit('form-field-validate-complete', { name, value: trimValue, index, validate: validateRes });
       });
       eventQueue.current.push({
         id: getTaskKey({ name, index }),
@@ -159,11 +193,13 @@ const useFormStateEvent = ({ state, rules, onPrevSubmit, onError, onSubmit, debu
     });
     emitter.addListener('form-data-set', ({ data }) => {
       setFormState(oldFormSate => {
+        dataRef.current = data;
         return parseFormData(oldFormSate, data);
       });
     });
     emitter.addListener('form-data-reset', () => {
       setFormState(oldFormSate => {
+        dataRef.current = {};
         const data = Object.assign({}, oldFormSate);
         Object.keys(data).forEach(name => {
           const filedData = data[name].data;
@@ -252,13 +288,19 @@ const Form = forwardRef((props, ref) => {
   const [formIsMount, setFormIsMount] = useState(false);
   const dataRef = useRef(data);
   const [formData] = formState;
-  const emitter = useFormStateEvent({ state: formState, onPrevSubmit, onError, onSubmit, rules: formRules, debug });
+  const emitter = useFormStateEvent({
+    state: formState,
+    dataRef,
+    onPrevSubmit,
+    onError,
+    onSubmit,
+    rules: formRules,
+    debug
+  });
   useEffect(() => {
     setFormIsMount(true);
+    dataRef.current && emitter.emit('form-data-set', { data: dataRef.current });
     emitter.emit('form-mount');
-    setTimeout(() => {
-      dataRef.current && emitter.emit('form-data-set', { data: dataRef.current });
-    }, 0);
     return () => {
       setFormIsMount(false);
       emitter.emit('form-unmount');
@@ -266,6 +308,16 @@ const Form = forwardRef((props, ref) => {
   }, [emitter]);
 
   const submitFormData = useMemo(() => computedFormData(formData), [formData]);
+  const fields = useMemo(() => {
+    return getFields(formData, (item, field) => {
+      return {
+        field: item,
+        label: field.label,
+        name: field.name,
+        rule: field.rule
+      };
+    });
+  }, [formData]);
 
   useImperativeHandle(
     ref,
@@ -281,11 +333,27 @@ const Form = forwardRef((props, ref) => {
         get data() {
           return computedFormData(formData);
         },
+        get fields() {
+          return fields;
+        },
+        get formState() {
+          return formData;
+        },
         set data(data) {
           emitter.emit('form-data-set', { data });
         },
         reset() {
           emitter.emit('form-data-reset');
+        },
+        onReady(callback) {
+          emitter.addListener('form-mount', () => {
+            callback && callback();
+          });
+        },
+        onDestroy(callback) {
+          emitter.addListener('form-unmount', () => {
+            callback && callback();
+          });
         },
         validateField(name, groupName) {
           const field = formData[name];
@@ -304,17 +372,20 @@ const Form = forwardRef((props, ref) => {
         }
       };
     },
-    [emitter, formData]
+    [emitter, fields, formData]
   );
   return (
     <Provider
       value={{
         formState: formData,
         formData: submitFormData,
+        formDataOriginRef: dataRef,
+        formIsMount,
         rules: formRules,
+        fields,
         emitter
       }}>
-      {formIsMount ? <Group>{props.children}</Group> : null}
+      <Group>{props.children}</Group>
     </Provider>
   );
 });

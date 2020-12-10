@@ -3,6 +3,7 @@ import { useFormContext } from './context';
 import getFieldValue from './getFieldValue';
 import { useGroup } from './group';
 import _get from 'lodash/get';
+import uniqueId from 'lodash/uniqueId';
 import { useDebouncedCallback } from 'use-debounce';
 
 const compileErrMsg = (errMsg, label) => {
@@ -11,18 +12,22 @@ const compileErrMsg = (errMsg, label) => {
 
 const useField = ({ name, rule, label, noTrim, debounce: time = 0, value, onChange, errMsg, ...args }) => {
   const { name: groupName, index: groupIndex } = useGroup();
-  const { formState, formData, emitter } = useFormContext();
+  const { formState, formData, formIsMount, emitter } = useFormContext();
   const [isValueChanged, setIsValueChanged] = useState(false);
-  const index = useMemo(() => Symbol(name), [name]);
+  const index = useMemo(() => Symbol(uniqueId(`${name}_`)), [name]);
   const field = _get(formState, `${name}`);
   const fieldData = _get(field, 'data', {})[index];
   const fieldRef = useRef(null);
   useEffect(() => {
-    emitter.emit('form-field-add', { name, rule, label, value, index, groupName, groupIndex, fieldRef });
+    let isEmit = false;
+    if (formIsMount) {
+      isEmit = true;
+      emitter.emit('form-field-add', { name, rule, label, value, index, groupName, groupIndex, fieldRef });
+    }
     return () => {
-      emitter.emit('form-field-remove', { name, index });
+      isEmit && emitter.emit('form-field-remove', { name, index });
     };
-  }, [name, emitter, groupName, groupIndex, rule, label, value, index]);
+  }, [name, emitter, groupName, groupIndex, rule, label, value, index, formIsMount]);
   const handlerChange = (...args) => {
     setIsValueChanged(true);
     const value = getFieldValue(...args);
