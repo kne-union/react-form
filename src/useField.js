@@ -10,7 +10,7 @@ const compileErrMsg = (errMsg, label) => {
   return typeof errMsg === 'string' ? errMsg.replace('%s', label) : errMsg(label);
 };
 
-const useField = ({ name, rule, label, noTrim, debounce: time = 0, value, onChange, errMsg, ...args }) => {
+const useField = ({ name, rule, label, noTrim, debounce: time = 0, onChange, value, errMsg, ...args }) => {
   const { name: groupName, index: groupIndex } = useGroup();
   const { formState, formData, formIsMount, emitter } = useFormContext();
   const [isValueChanged, setIsValueChanged] = useState(false);
@@ -22,19 +22,20 @@ const useField = ({ name, rule, label, noTrim, debounce: time = 0, value, onChan
     let isEmit = false;
     if (formIsMount) {
       isEmit = true;
-      emitter.emit('form-field-add', { name, rule, label, value, index, groupName, groupIndex, fieldRef });
+      emitter.emit('form-field-add', { name, rule, label, noTrim, value, index, groupName, groupIndex, fieldRef });
     }
     return () => {
       isEmit && emitter.emit('form-field-remove', { name, index });
     };
-  }, [name, emitter, groupName, groupIndex, rule, label, value, index, formIsMount]);
+  }, [name, emitter, groupName, groupIndex, rule, noTrim, label, value, index, formIsMount]);
   const handlerChange = (...args) => {
+    onChange && onChange(...args);
     setIsValueChanged(true);
     const value = getFieldValue(...args);
     emitter.emit('form-field-data-change', { name, value, index });
   };
   const checkValidate = () => {
-    emitter.emit('form-field-validate', { name, index, noTrim });
+    emitter.emit('form-field-validate', { name, index });
   };
   const { callback: debouncedCheckValidate, cancel } = useDebouncedCallback(checkValidate, time);
   useEffect(() => {

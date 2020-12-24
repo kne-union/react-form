@@ -16,7 +16,7 @@ export const useGroup = () => {
 export const GroupList = forwardRef(({ name, groupKey, children }, ref) => {
   const [list, setList] = useState([]);
   const emitter = useEmitter();
-  const { formDataOriginRef } = useFormContext();
+  const { initDataRef } = useFormContext();
 
   const createGroupIndex = useCallback(() => {
     return uniqueId(`group_${name}_`);
@@ -30,8 +30,8 @@ export const GroupList = forwardRef(({ name, groupKey, children }, ref) => {
   );
 
   useEffect(() => {
-    formDataOriginRef.current && setGroupList(get(formDataOriginRef.current, name));
-  }, [setGroupList, name]);
+    initDataRef.current && setGroupList(get(initDataRef.current, name));
+  }, [setGroupList, initDataRef, name]);
 
   useEffect(() => {
     const sub1 = emitter.addListener('form-data-reset', () => {
@@ -45,7 +45,7 @@ export const GroupList = forwardRef(({ name, groupKey, children }, ref) => {
       sub1 && sub1.remove();
       sub2 && sub2.remove();
     };
-  }, [emitter, setGroupList]);
+  }, [emitter, name, setGroupList]);
 
   const addHandler = useCallback(() => {
     setList(oldList => {

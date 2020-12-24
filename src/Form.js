@@ -10,20 +10,25 @@ import { getFields, computedFormData, parseFormData, computedIsPass, computedErr
 import Group from './group';
 import RULES from './RULES';
 
-const useFormStateEvent = ({ state, dataRef, rules, onPrevSubmit, onError, onSubmit, debug }) => {
+const usePropsRef = props => {
+  const propsRef = useRef({});
+  Object.keys(props).forEach(name => {
+    propsRef.current[name] = props[name];
+  });
+  return propsRef;
+};
+
+const useFormStateEvent = ({ state, initDataRef, rules, onPrevSubmit, onError, onSubmit, debug }) => {
   const emitter = useEvent(debug);
   const [formState, setFormState] = state;
-  const formStateRef = useRef(formState);
-  const formRulesRef = useRef(rules);
-  const onPrevSubmitRef = useRef(onPrevSubmit);
-  const onErrorRef = useRef(onError);
-  const onSubmitRef = useRef(onSubmit);
   const eventQueue = useRef([]);
-  formStateRef.current = Object.assign({}, formState);
-  formRulesRef.current = Object.assign({}, rules);
-  onSubmitRef.current = onSubmit;
-  onErrorRef.current = onError;
-  onPrevSubmitRef.current = onPrevSubmit;
+  const propsRef = usePropsRef({
+    formState,
+    rules,
+    onPrevSubmit,
+    onError,
+    onSubmit
+  });
 
   useEffect(() => {
     emitter.emit('form-state-change', { data: computedFormData(formState), state: formState });
@@ -39,13 +44,22 @@ const useFormStateEvent = ({ state, dataRef, rules, onPrevSubmit, onError, onSub
       field.data = filedData;
       return Object.assign({}, oldState, { [name]: field });
     };
+    const validateAllFields = () => {
+      Object.keys(propsRef.current.formState).forEach(name => {
+        const field = propsRef.current.formState[name];
+        Object.getOwnPropertySymbols(field.data).forEach(index => {
+          emitter.emit('form-field-validate', { name, index });
+        });
+      });
+      return Promise.all(eventQueue.current.map(({ task }) => task));
+    };
     const getTaskKey = ({ index }) => {
       return index;
     };
     const getFormData = () => {
-      return computedFormData(formStateRef.current);
+      return computedFormData(propsRef.current.formState);
     };
-    emitter.addListener('form-field-add', ({ name, label, rule, value, index, groupName, fieldRef }) => {
+    emitter.addListener('form-field-add', ({ name, label, rule, noTrim, value, index, groupName, fieldRef }) => {
       setFormState(oldState => {
         const fieldItem = Object.assign({}, oldState[name], {});
 
@@ -59,33 +73,37 @@ const useFormStateEvent = ({ state, dataRef, rules, onPrevSubmit, onError, onSub
           (() => {
             if (groupName && groupName === name) {
               const path = `["${groupName}"]["${nextIndex}"]`;
-              const target = _get(dataRef.current, path);
-              const other = cloneDeep(dataRef.current);
+              const target = _get(initDataRef.current, path);
+              const other = cloneDeep(initDataRef.current);
               if (Array.isArray(other[groupName])) {
                 other[groupName].splice(nextIndex, 0);
               }
-              dataRef.current = other;
+              initDataRef.current = other;
               return target;
             }
 
             if (groupName) {
               const path = `["${groupName}"]["${nextIndex}"]["${name}"]`;
-              const target = _get(dataRef.current, path);
-              const other = cloneDeep(dataRef.current);
+              const target = _get(initDataRef.current, path);
+              const other = cloneDeep(initDataRef.current);
               unset(other, path);
-              dataRef.current = other;
+              initDataRef.current = other;
               return target;
             }
-            return _get(dataRef.current, name);
+            return _get(initDataRef.current, name);
           })();
         fieldItem.data[index] = {
           index: nextIndex,
           SymbolIndex: index,
+          noTrim,
           groupName,
           fieldRef
         };
         if (formDefaultValue !== undefined) {
           fieldItem.data[index].value = formDefaultValue;
+          setTimeout(() => {
+            emitter.emit('form-field-validate', { name, index });
+          });
         }
         return Object.assign({}, oldState, {
           [name]: fieldItem
@@ -107,8 +125,8 @@ const useFormStateEvent = ({ state, dataRef, rules, onPrevSubmit, onError, onSub
         return state;
       });
     });
-    emitter.addListener('form-field-validate', ({ name, index, noTrim }) => {
-      const item = formStateRef.current[name];
+    emitter.addListener('form-field-validate', ({ name, index }) => {
+      const item = propsRef.current.formState[name];
       setFormState(
         createSetFieldInfo({
           name,
@@ -132,8 +150,8 @@ const useFormStateEvent = ({ state, dataRef, rules, onPrevSubmit, onError, onSub
         currentTask.task.cancel();
         splitTask();
       }
-
-      const value = _get(item.data[index], 'value');
+      const value = _get(item.data[index], 'value'),
+        noTrim = _get(item.data[index], 'noTrim');
       let trimValue = value;
       if (typeof value === 'string' && noTrim !== true) {
         trimValue = value.trim();
@@ -145,7 +163,7 @@ const useFormStateEvent = ({ state, dataRef, rules, onPrevSubmit, onError, onSub
         ruleValidate({
           filed: item.field,
           value: trimValue,
-          formRules: formRulesRef.current,
+          formRules: propsRef.current.rules,
           getFormData
         })
       );
@@ -193,13 +211,14 @@ const useFormStateEvent = ({ state, dataRef, rules, onPrevSubmit, onError, onSub
     });
     emitter.addListener('form-data-set', ({ data }) => {
       setFormState(oldFormSate => {
-        dataRef.current = data;
+        initDataRef.current = data;
         return parseFormData(oldFormSate, data);
       });
+      setTimeout(validateAllFields);
     });
     emitter.addListener('form-data-reset', () => {
       setFormState(oldFormSate => {
-        dataRef.current = {};
+        initDataRef.current = {};
         const data = Object.assign({}, oldFormSate);
         Object.keys(data).forEach(name => {
           const filedData = data[name].data;
@@ -232,30 +251,24 @@ const useFormStateEvent = ({ state, dataRef, rules, onPrevSubmit, onError, onSub
       });
     });
     emitter.addListener('form-submit', () => {
-      Object.keys(formStateRef.current).forEach(name => {
-        const field = formStateRef.current[name];
-        Object.getOwnPropertySymbols(field.data).forEach(index => {
-          emitter.emit('form-field-validate', { name, index });
-        });
-      });
-      Promise.all(eventQueue.current.map(({ task }) => task))
+      validateAllFields()
         .then(() => {
           return (async () => {
-            const isPass = computedIsPass(formStateRef.current);
+            const isPass = computedIsPass(propsRef.current.formState);
             if (!isPass) {
-              const errors = computedError(formStateRef.current);
+              const errors = computedError(propsRef.current.formState);
               emitter.emit('form-submit-error', errors);
-              onErrorRef.current && (await onErrorRef.current(errors));
+              propsRef.current.onError && (await propsRef.current.onError(errors));
               return false;
             }
 
             const formData = getFormData();
             emitter.emit('form-prev-submit');
-            if (onPrevSubmitRef.current && (await onPrevSubmitRef.current(formData)) === false) {
+            if (propsRef.current.onPrevSubmit && (await propsRef.current.onPrevSubmit(formData)) === false) {
               emitter.emit('form-prev-submit-error');
               return false;
             }
-            onSubmitRef.current && onSubmitRef.current(formData);
+            propsRef.current.onSubmit && propsRef.current.onSubmit(formData);
             emitter.emit('form-submit-success', formData);
             return true;
           })();
@@ -276,7 +289,7 @@ const useFormStateEvent = ({ state, dataRef, rules, onPrevSubmit, onError, onSub
     return () => {
       emitter.removeAllListeners();
     };
-  }, [emitter, setFormState]);
+  }, [emitter, setFormState, propsRef, initDataRef]);
 
   return emitter;
 };
@@ -284,13 +297,12 @@ const useFormStateEvent = ({ state, dataRef, rules, onPrevSubmit, onError, onSub
 const Form = forwardRef((props, ref) => {
   const { onPrevSubmit, rules, data, onError, onSubmit, debug } = props;
   const formRules = Object.assign({}, RULES, rules);
-  const formState = useState({});
+  const [formState, setFormState] = useState({});
   const [formIsMount, setFormIsMount] = useState(false);
-  const dataRef = useRef(data);
-  const [formData] = formState;
+  const initDataRef = useRef(data);
   const emitter = useFormStateEvent({
-    state: formState,
-    dataRef,
+    state: [formState, setFormState],
+    initDataRef,
     onPrevSubmit,
     onError,
     onSubmit,
@@ -299,17 +311,16 @@ const Form = forwardRef((props, ref) => {
   });
   useEffect(() => {
     setFormIsMount(true);
-    dataRef.current && emitter.emit('form-data-set', { data: dataRef.current });
+    initDataRef.current && emitter.emit('form-data-set', { data: initDataRef.current });
     emitter.emit('form-mount');
     return () => {
-      setFormIsMount(false);
       emitter.emit('form-unmount');
     };
   }, [emitter]);
 
-  const submitFormData = useMemo(() => computedFormData(formData), [formData]);
+  const formData = useMemo(() => computedFormData(formState), [formState]);
   const fields = useMemo(() => {
-    return getFields(formData, (item, field) => {
+    return getFields(formState, (item, field) => {
       return {
         field: item,
         label: field.label,
@@ -317,7 +328,7 @@ const Form = forwardRef((props, ref) => {
         rule: field.rule
       };
     });
-  }, [formData]);
+  }, [formState]);
 
   useImperativeHandle(
     ref,
@@ -328,16 +339,16 @@ const Form = forwardRef((props, ref) => {
           emitter.emit('form-submit');
         },
         get isPass() {
-          return computedIsPass(formData);
+          return computedIsPass(formState);
         },
         get data() {
-          return computedFormData(formData);
+          return computedFormData(formState);
         },
         get fields() {
           return fields;
         },
         get formState() {
-          return formData;
+          return formState;
         },
         set data(data) {
           emitter.emit('form-data-set', { data });
@@ -356,7 +367,7 @@ const Form = forwardRef((props, ref) => {
           });
         },
         validateField(name, groupName) {
-          const field = formData[name];
+          const field = formState[name];
           const index = Object.getOwnPropertySymbols(field.data).find(index => {
             const item = field.data[index];
             return !groupName || groupName === item.groupName;
@@ -372,14 +383,14 @@ const Form = forwardRef((props, ref) => {
         }
       };
     },
-    [emitter, fields, formData]
+    [emitter, fields, formState]
   );
   return (
     <Provider
       value={{
-        formState: formData,
-        formData: submitFormData,
-        formDataOriginRef: dataRef,
+        formState,
+        formData,
+        initDataRef,
         formIsMount,
         rules: formRules,
         fields,

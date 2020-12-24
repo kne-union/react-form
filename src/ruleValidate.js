@@ -9,13 +9,10 @@ const ruleValidate = async ({ filed, value, formRules, getFormData }) => {
     };
   }
   if (typeof filed.rule === 'string') {
-    const rules = filed.rule
-      .split(' ')
-      .filter(str => str.length > 0)
-      .map(str => str.toUpperCase());
+    const rules = filed.rule.split(' ').filter(str => str.length > 0);
     for (let currentRule of rules) {
       let [key, ...args] = currentRule.split('-');
-      const exec = formRules[key];
+      const exec = formRules[key.toUpperCase()];
       if (typeof exec === 'function') {
         //空值处理 如果不为REQ规则的规则REQ判断不通过返回正确
         if (currentRule !== 'REQ') {
