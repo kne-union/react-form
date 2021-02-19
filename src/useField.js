@@ -5,12 +5,13 @@ import { useGroup } from './group';
 import _get from 'lodash/get';
 import uniqueId from 'lodash/uniqueId';
 import { useDebouncedCallback } from 'use-debounce';
+import interceptors from './interceptors';
 
 const compileErrMsg = (errMsg, label) => {
   return typeof errMsg === 'string' ? errMsg.replace('%s', label) : errMsg(label);
 };
 
-const useField = ({ name, rule, label, noTrim, debounce: time = 0, onChange, value, errMsg, ...args }) => {
+const useField = ({ name, rule, label, interceptor, noTrim, debounce: time = 0, onChange, value, errMsg, ...args }) => {
   const { name: groupName, index: groupIndex } = useGroup();
   const { formState, formData, formIsMount, emitter } = useFormContext();
   const [isValueChanged, setIsValueChanged] = useState(false);
@@ -22,7 +23,18 @@ const useField = ({ name, rule, label, noTrim, debounce: time = 0, onChange, val
     let isEmit = false;
     if (formIsMount) {
       isEmit = true;
-      emitter.emit('form-field-add', { name, rule, label, noTrim, value, index, groupName, groupIndex, fieldRef });
+      emitter.emit('form-field-add', {
+        name,
+        rule,
+        label,
+        interceptor,
+        noTrim,
+        value,
+        index,
+        groupName,
+        groupIndex,
+        fieldRef
+      });
     }
     return () => {
       isEmit && emitter.emit('form-field-remove', { name, index });

@@ -9,3 +9,4 @@ export { default as useFieldInfo } from './useFieldInfo';
 export { default as Group } from './group';
 export { useFormContext } from './context';
 export { presetRules as preset, default as RULES } from './RULES';
+export { default as interceptors } from './interceptors';

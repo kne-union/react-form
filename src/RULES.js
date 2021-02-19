@@ -1,22 +1,9 @@
-import isPlainObject from 'lodash/isPlainObject';
-import isArray from 'lodash/isArray';
-import getValues from 'lodash/values';
+import { isNotEmpty } from './empty';
 
 const RULES = {
   REQ: function (value) {
     return {
-      result: (value => {
-        if (isPlainObject(value)) {
-          const values = getValues(value);
-          return values.length > 0 && values.every(item => !!item);
-        } else if (isArray(value)) {
-          return value.length > 0;
-        } else if (typeof value === 'number') {
-          return !isNaN(value);
-        } else {
-          return !(value === undefined || value === null || value === '' || value.length === 0);
-        }
-      })(value),
+      result: isNotEmpty(value),
       errMsg: ''
     };
   },

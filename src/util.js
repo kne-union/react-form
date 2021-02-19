@@ -1,4 +1,5 @@
 import _get from 'lodash/get';
+import { runInterceptors } from './interceptors';
 
 export const getFields = (data, callback) => {
   const output = {};
@@ -32,11 +33,11 @@ export const getFields = (data, callback) => {
   return output;
 };
 
-export const computedFormData = data => {
-  return getFields(data, item => item.value);
+export const computedFormData = (data, interceptors) => {
+  return getFields(data, item => runInterceptors(interceptors, 'output', item.interceptor)(item.value));
 };
 
-export const parseFormData = (data, formData) => {
+export const parseFormData = (data, formData, interceptors) => {
   data = Object.assign({}, data);
   formData = Object.assign({}, formData);
   Object.keys(data).forEach(name => {
@@ -45,6 +46,7 @@ export const parseFormData = (data, formData) => {
     fieldData.forEach(index => {
       const item = Object.assign({}, field[index]),
         groupName = item.groupName;
+
       const targetIndex = item.index;
       const value = (() => {
         if (groupName && groupName === name) {
@@ -56,7 +58,7 @@ export const parseFormData = (data, formData) => {
         return _get(formData, name);
       })();
       if (value !== void 0) {
-        item.value = value;
+        item.value = runInterceptors(interceptors, 'input', item.interceptor)(value);
         item.validate = {
           status: 0,
           msg: ''

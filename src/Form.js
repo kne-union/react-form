@@ -9,6 +9,8 @@ import cancelablePromise from './cancelablePromise';
 import { getFields, computedFormData, parseFormData, computedIsPass, computedError } from './util';
 import Group from './group';
 import RULES from './RULES';
+import { filterEmpty } from './empty';
+import { runInterceptors } from './interceptors';
 
 const usePropsRef = props => {
   const propsRef = useRef({});
@@ -18,7 +20,7 @@ const usePropsRef = props => {
   return propsRef;
 };
 
-const useFormStateEvent = ({ state, initDataRef, rules, onPrevSubmit, onError, onSubmit, debug }) => {
+const useFormStateEvent = ({ state, initDataRef, rules, interceptors, noFilter, onPrevSubmit, onError, onSubmit, debug }) => {
   const emitter = useEvent(debug);
   const [formState, setFormState] = state;
   const eventQueue = useRef([]);
@@ -31,7 +33,7 @@ const useFormStateEvent = ({ state, initDataRef, rules, onPrevSubmit, onError, o
   });
 
   useEffect(() => {
-    emitter.emit('form-state-change', { data: computedFormData(formState), state: formState });
+    emitter.emit('form-state-change', { data: computedFormData(formState, interceptors), state: formState });
   }, [emitter, formState]);
 
   useEffect(() => {
@@ -57,9 +59,10 @@ const useFormStateEvent = ({ state, initDataRef, rules, onPrevSubmit, onError, o
       return index;
     };
     const getFormData = () => {
-      return computedFormData(propsRef.current.formState);
+      const value = computedFormData(propsRef.current.formState, interceptors);
+      return noFilter ? value : filterEmpty(value);
     };
-    emitter.addListener('form-field-add', ({ name, label, rule, noTrim, value, index, groupName, fieldRef }) => {
+    emitter.addListener('form-field-add', ({ name, label, rule, interceptor, noTrim, value, index, groupName, fieldRef }) => {
       setFormState(oldState => {
         const fieldItem = Object.assign({}, oldState[name], {});
 
@@ -97,10 +100,11 @@ const useFormStateEvent = ({ state, initDataRef, rules, onPrevSubmit, onError, o
           SymbolIndex: index,
           noTrim,
           groupName,
-          fieldRef
+          fieldRef,
+          interceptor
         };
         if (formDefaultValue !== undefined) {
-          fieldItem.data[index].value = formDefaultValue;
+          fieldItem.data[index].value = runInterceptors(interceptors, 'input', interceptor)(formDefaultValue);
           setTimeout(() => {
             emitter.emit('form-field-validate', { name, index });
           });
@@ -212,7 +216,7 @@ const useFormStateEvent = ({ state, initDataRef, rules, onPrevSubmit, onError, o
     emitter.addListener('form-data-set', ({ data }) => {
       setFormState(oldFormSate => {
         initDataRef.current = data;
-        return parseFormData(oldFormSate, data);
+        return parseFormData(oldFormSate, data, interceptors);
       });
       setTimeout(validateAllFields);
     });
@@ -295,7 +299,7 @@ const useFormStateEvent = ({ state, initDataRef, rules, onPrevSubmit, onError, o
 };
 
 const Form = forwardRef((props, ref) => {
-  const { onPrevSubmit, rules, data, onError, onSubmit, debug } = props;
+  const { onPrevSubmit, rules, interceptors, noFilter, data, onError, onSubmit, debug } = props;
   const formRules = Object.assign({}, RULES, rules);
   const [formState, setFormState] = useState({});
   const [formIsMount, setFormIsMount] = useState(false);
@@ -307,6 +311,8 @@ const Form = forwardRef((props, ref) => {
     onError,
     onSubmit,
     rules: formRules,
+    interceptors,
+    noFilter,
     debug
   });
   useEffect(() => {
@@ -318,7 +324,7 @@ const Form = forwardRef((props, ref) => {
     };
   }, [emitter]);
 
-  const formData = useMemo(() => computedFormData(formState), [formState]);
+  const formData = useMemo(() => computedFormData(formState, interceptors), [formState]);
   const fields = useMemo(() => {
     return getFields(formState, (item, field) => {
       return {
@@ -342,7 +348,7 @@ const Form = forwardRef((props, ref) => {
           return computedIsPass(formState);
         },
         get data() {
-          return computedFormData(formState);
+          return computedFormData(formState, interceptors);
         },
         get fields() {
           return fields;
