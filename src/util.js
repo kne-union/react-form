@@ -34,7 +34,12 @@ export const getFields = (data, callback) => {
 };
 
 export const computedFormData = (data, interceptors) => {
-  return getFields(data, item => runInterceptors(interceptors, 'output', item.interceptor)(item.value));
+  return getFields(data, item => {
+    if (item.value === void 0) {
+      return item.value;
+    }
+    return runInterceptors(interceptors, 'output', item.interceptor)(item.value);
+  });
 };
 
 export const parseFormData = (data, formData, interceptors) => {
