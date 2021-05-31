@@ -16,7 +16,6 @@ export class Task {
       return res;
     });
     this.target.then((...args) => {
-      console.log('complete');
       return Promise.resolve(complete(...args));
     });
   }

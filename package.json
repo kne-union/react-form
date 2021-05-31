@@ -1,6 +1,6 @@
 {
   "name": "@kne/react-form",
-  "version": "1.2.0",
+  "version": "1.2.0-alpha.0.1",
   "description": "用于表单验证的react组件",
   "author": "https://github.com/kne-union",
   "license": "MIT",
@@ -12,15 +12,18 @@
     "node": ">=10"
   },
   "scripts": {
-    "build": "microbundle-crl --no-compress --format modern,cjs",
-    "start": "microbundle-crl watch --no-compress --format modern,cjs",
-    "prepare": "run-s build",
+    "init": "run-p npm install cd example && npm install",
+    "start": "run-p start:lib start:example",
+    "build": "run-s build:lib build:example",
+    "build:lib": "microbundle-crl --no-compress --format modern,cjs",
+    "start:lib": "microbundle-crl watch --no-compress --format modern,cjs",
     "test": "run-s test:unit test:lint test:build",
     "test:build": "run-s build",
     "test:lint": "eslint .",
     "test:unit": "cross-env CI=1 react-scripts test --env=jsdom",
     "test:watch": "react-scripts test --env=jsdom",
-    "predeploy": "cd example && npm install && npm run build",
+    "build:example": "cd example && npm run build",
+    "start:example": "cd example && npm run start",
     "deploy": "gh-pages -d example/build"
   },
   "peerDependencies": {
