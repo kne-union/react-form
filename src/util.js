@@ -1,4 +1,6 @@
 import _get from 'lodash/get';
+import _set from 'lodash/set';
+import _last from 'lodash/last';
 import { runInterceptors } from './interceptors';
 
 export const getFields = (data, callback) => {
@@ -10,19 +12,19 @@ export const getFields = (data, callback) => {
       const item = field[index],
         groupName = item.groupName;
       if (groupName) {
-        if (!output[groupName]) {
-          output[groupName] = [];
+        if (!_get(output, groupName)) {
+          _set(output, groupName, []);
         }
         const targetIndex = item.index;
-        if (!output[groupName][targetIndex]) {
-          output[groupName][targetIndex] = {};
+        if (!_get(output, groupName)[targetIndex]) {
+          _set(output, `${groupName}[${targetIndex}]`, {});
         }
-        if (groupName === name) {
-          output[groupName][targetIndex] = callback(item, data[name].field);
+        if (_last(groupName.split('.')) === name) {
+          _set(output, `${groupName}[${targetIndex}]`, callback(item, data[name].field));
           return;
         }
 
-        output[groupName][targetIndex][name] = callback(item, data[name].field);
+        _set(output, `${groupName}[${targetIndex}]['${name}']`, callback(item, data[name].field));
         return;
       }
 
@@ -54,7 +56,7 @@ export const parseFormData = (data, formData, interceptors) => {
 
       const targetIndex = item.index;
       const value = (() => {
-        if (groupName && groupName === name) {
+        if (groupName && _last(groupName.split('.')) === name) {
           return _get(formData, `${groupName}[${targetIndex}]`);
         }
         if (groupName) {
@@ -89,7 +91,7 @@ export const computedError = data => {
   const output = [];
   Object.keys(data).forEach(name => {
     const field = data[name].data;
-    Object.getOwnPropertySymbols(field).forEach((index, defaultIndex) => {
+    Object.getOwnPropertySymbols(field).forEach(index => {
       const item = field[index];
       if (_get(item, 'validate.status') === 2) {
         const targetIndex = item.index,

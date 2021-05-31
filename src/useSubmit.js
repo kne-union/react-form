@@ -1,13 +1,9 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useFormContext } from './context';
-import { computedIsPass } from './util';
 
 const useSubmit = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { formState, emitter } = useFormContext();
-  const isPass = useMemo(() => {
-    return computedIsPass(formState);
-  }, [formState]);
+  const { isPass, emitter } = useFormContext();
   useEffect(() => {
     const target = emitter.addListener('form-submit-complete', () => {
       setIsLoading(false);

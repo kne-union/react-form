@@ -25,7 +25,7 @@ const ruleValidate = async ({ filed, value, formRules, getFormData }) => {
           }
         }
 
-        const res = exec(value, ...args, getFormData);
+        const res = await exec(value, ...args, getFormData);
         if (res.result !== true) {
           return {
             result: false,
