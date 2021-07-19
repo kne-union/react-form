@@ -1,4 +1,5 @@
 import Form from './Form';
+import { isNotEmpty, isEmpty, filterEmpty } from './empty';
 
 export default Form;
 export { default as useField } from './useField';
@@ -10,3 +11,9 @@ export { default as Group } from './Group';
 export { useFormContext } from './context';
 export { presetRules as preset, default as RULES } from './RULES';
 export { default as interceptors } from './interceptors';
+
+export const util = {
+  isNotEmpty,
+  isEmpty,
+  filterEmpty
+};

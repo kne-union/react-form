@@ -27,6 +27,13 @@ const useFormEvent = ({ debug, interceptors, rules, formStateRef, initDataRef, s
     rules,
     interceptors
   });
+  otherProps.current = {
+    onPrevSubmit,
+    onError,
+    onSubmit,
+    rules,
+    interceptors
+  };
   useEffect(() => {
     const taskQueue = new TaskQueue();
     emitter.addListener(
@@ -35,7 +42,7 @@ const useFormEvent = ({ debug, interceptors, rules, formStateRef, initDataRef, s
         formStateRef,
         initDataRef,
         setFormState,
-        interceptors: otherProps.current.interceptors,
+        otherProps,
         emitter
       })
     );
@@ -46,7 +53,7 @@ const useFormEvent = ({ debug, interceptors, rules, formStateRef, initDataRef, s
         formStateRef,
         setFormState,
         taskQueue,
-        rules: otherProps.current.rules,
+        otherProps,
         emitter
       })
     );
@@ -57,7 +64,7 @@ const useFormEvent = ({ debug, interceptors, rules, formStateRef, initDataRef, s
         setFormState,
         formStateRef,
         initDataRef,
-        interceptors: otherProps.current.interceptors,
+        otherProps,
         taskQueue,
         emitter
       })
@@ -69,6 +76,8 @@ const useFormEvent = ({ debug, interceptors, rules, formStateRef, initDataRef, s
       submitCreator({
         formStateRef,
         taskQueue,
+        otherProps,
+
         onPrevSubmit: otherProps.current.onPrevSubmit,
         onError: otherProps.current.onError,
         onSubmit: otherProps.current.onSubmit,

@@ -26,7 +26,7 @@ const useFieldInit = ({ name, rule, label, interceptor, noTrim, value, index, gr
       isEmit && emitter.emit('form-field-remove', { name, index });
     };
   }, [formIsMount, emitter, name, rule, label, interceptor, noTrim, index, groupName, groupIndex, fieldRef]);
-  return valueRef;
+  return fieldRef;
 };
 
 export default useFieldInit;

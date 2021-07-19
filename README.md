@@ -1,29 +1,43 @@
-# react-form
+# ReactForm
+> ReactForm 是一个用于表单验证的React组件库
+## 特点
 
-> npx create-react-library
+* 基于事件总线的设计：将表单中的动作以事件的方式呈现，便于在其外部做自定义的扩展。
 
-[![NPM](https://img.shields.io/npm/v/react-form.svg)](https://www.npmjs.com/package/react-form) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+* 预制化验证规则：在复杂的验证场景下，验证规则也是非常复杂的。我们的设计思路在于尽可能的将复杂的验证规则集中编写，集中管理，在表单的字段上，您只需要配置简单的字符串就能将他们组合，达到业务目的。我们不希望这些复杂的验证规则代码随手写的到处都是，失去可维护性和复用性。
 
-## Install
+* 可组合的验证规则：我们希望验证规则保持功能单一性，所以我们设计了可组合的验证规则，通过用空格链接起来的验证规则字符串可以被ReactForm内部解析，串行执行。在执行校验时，如果前面的验证规则验证不通过，那么后面的规则将不再会被执行。
 
-```bash
-npm install --save react-form
-```
+* 支持远程校验：在某些场景需要去服务器端验证数据是否合法，所以我们的验证规则时支持远程校验的，你只需要在验证规则函数返回Promise，在验证完成之前字段组件就会获取到正在验证的状态，如果在结果返回之前提交了表单，那么该表单会在所有字段的验证结束之后提交。如果在远程验证返回结果之前修改了字段的值再次触发了校验，我们会对之前没有返回结果的检验做丢弃处理，所以该字段的校验状态永远是最后一次出发校验后的校验结果。
 
-## Usage
+* 支持表单字段分组：ReactForm支持表单中的字段分组功能，这在类似简历中的多段工作经历等场景会非常有用。
 
-```jsx
-import React, { Component } from 'react'
+* 支持拦截器： ReactForm参考了Axios 的拦截器功能，可以给表单也添加拦截器，拦截器有input和output两种，可以自动转换输入表单的值和输出表单的值，这在日期选择器等场景会非常有用，因为后端传到前端的日期数据一般是字符串，前端提交给后端的数据也是字符串，但是大多数日期选择器组件的输入输出值是Date类型或者Moment类型，利用拦截器功能你可以一站式解决这个问题。
 
-import MyComponent from 'react-form'
-import 'react-form/dist/index.css'
+* 支持UI自定义：ReactForm只实现了Form验证的逻辑，没有实现对应的UI，比如验证错误需要字段变红，需要出现提示语句，表单在提交过程中提交按钮需要展示loading，并且禁止其在请求返回结果前重复提交。ReactForm在内部实现了所有的逻辑，并且把相关的状态保存到了其上下文之中，通过非常简单的办法就可以赋值给对应的UI组件库，你可以按照自己的业务和UI要求自行实现UI判断逻辑。但是我们还是希望ReactForm是一个开箱既用的组件库，所以我们实现了Ant.Desin的表单组件和Ant.Desin mobile 的表单组件。如果你有自己实现的表单字段组件也可以通过简单的绑定操作被ReactForm支持。
 
-class Example extends Component {
-  render() {
-    return <MyComponent />
-  }
-}
-```
+## 概念
+
+> 在表单验证过程中，我们把可以输入值，并且需要提交数据给服务器端的组件叫做字段(Field)，把输入数据的组件叫做输入组件。比如AntDesin的Input组件，Selct组件，Switch组件就属于输入组件，在利用ReactForm的useField封装过的组件叫做字段。在ReactForm的使用中，你需要在使用Field之前就对输入组件进行封装，形成自己的表单字段库，并且是可以复用的，不期望在每个使用的地方再做一遍封装这个动作。ReactForm的设计哲学是把复杂的事情放在定义阶段做，在使用过程中要确保绝对的简单。
+
+## 示例
+
+1. 一个简单的原生的input的字段封装
+2. 多重校验规则的使用
+3. 远程校验
+4. 字段分组
+5. 拦截器
+6. 调试模式
+7. Form API
+8. 预制规则
+9. 关联规则
+10. 表单赋值
+11. 清空表单
+12. 表单缓存
+13. 触发表单内部事件
+
+## API文档
+
 
 ## License
 

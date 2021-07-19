@@ -1,9 +1,10 @@
 import { computedIsPass, computedFormData, computedError } from '../util';
 import validateAllFieldsCreator from './validateAllFieldsCreator';
 
-const submitCreator = ({ formStateRef, taskQueue, onPrevSubmit, onError, onSubmit, emitter }) => {
+const submitCreator = ({ formStateRef, taskQueue, otherProps, emitter }) => {
   const validateAllFields = validateAllFieldsCreator({ formStateRef, taskQueue, emitter });
   return () => {
+    const { onPrevSubmit, onError, onSubmit } = otherProps.current;
     validateAllFields()
       .then(async () => {
         const formState = formStateRef.current;

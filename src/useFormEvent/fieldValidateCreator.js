@@ -3,7 +3,7 @@ import createSetFieldInfo from './createSetFieldInfo';
 import { computedFormData } from '../util';
 import _get from 'lodash/get';
 
-const fieldValidateCreator = ({ formStateRef, setFormState, rules, taskQueue, emitter }) => {
+const fieldValidateCreator = ({ formStateRef, setFormState, otherProps, taskQueue, emitter }) => {
   const setFieldInfo = createSetFieldInfo({ formStateRef });
   return ({ name, index }) => {
     const item = formStateRef.current[name];
@@ -36,7 +36,7 @@ const fieldValidateCreator = ({ formStateRef, setFormState, rules, taskQueue, em
         return ruleValidate({
           filed: item.field,
           value: trimValue,
-          formRules: rules,
+          formRules: otherProps.current.rules,
           getFormData: () => {
             computedFormData(formStateRef.current);
           }
