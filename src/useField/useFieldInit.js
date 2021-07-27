@@ -4,28 +4,32 @@ import { useFormContext } from '../context';
 const useFieldInit = ({ name, rule, label, interceptor, noTrim, value, index, groupName, groupIndex }) => {
   const fieldRef = useRef(null);
   const { formIsMount, emitter } = useFormContext();
-  const valueRef = useRef(value);
   useEffect(() => {
     let isEmit = false;
-    if (formIsMount && groupIndex !== -1) {
+    if (formIsMount) {
       isEmit = true;
-      emitter.emit('form-field-add', {
+      emitter.emit('form-field-add', { name, index });
+    }
+    return () => {
+      isEmit && emitter.emit('form-field-remove', { name, index });
+    };
+  }, [formIsMount, emitter, name, index, rule]);
+
+  useEffect(() => {
+    if (formIsMount && groupIndex !== -1) {
+      emitter.emit('form-field-edit', {
         name,
         rule,
         label,
         interceptor,
         noTrim,
-        value: valueRef.current,
         index,
         groupName,
         groupIndex,
-        fieldRef
+        value
       });
     }
-    return () => {
-      isEmit && emitter.emit('form-field-remove', { name, index });
-    };
-  }, [formIsMount, emitter, name, rule, label, interceptor, noTrim, index, groupName, groupIndex, fieldRef]);
+  }, [formIsMount, emitter, name, rule, label, interceptor, noTrim, index, groupName, groupIndex, value]);
   return fieldRef;
 };
 

@@ -34,7 +34,7 @@ const fieldValidateCreator = ({ formStateRef, setFormState, otherProps, taskQueu
       id: index,
       runner: () => {
         return ruleValidate({
-          filed: item.field,
+          filed: Object.assign({}, item.field, { rule: item.data[index].rule }),
           value: trimValue,
           formRules: otherProps.current.rules,
           getFormData: () => {

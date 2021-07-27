@@ -1,6 +1,7 @@
 import useEvent from '../useEvent';
 import { useEffect, useRef } from 'react';
 import fieldAddCreator from './fieldAddCreator';
+import fieldEditCreator from './fieldEditCreator';
 import fieldRemoveCreator from './fieldRemoveCreator';
 import fieldValidateCreator from './fieldValidateCreator';
 import fieldDataChangeCreator from './fieldDataChangeCreator';
@@ -40,10 +41,16 @@ const useFormEvent = ({ debug, interceptors, rules, formStateRef, initDataRef, s
       'form-field-add',
       fieldAddCreator({
         formStateRef,
+        setFormState
+      })
+    );
+    emitter.addListener(
+      'form-field-edit',
+      fieldEditCreator({
+        formStateRef,
         initDataRef,
         setFormState,
-        otherProps,
-        emitter
+        otherProps
       })
     );
     emitter.addListener('form-field-remove', fieldRemoveCreator({ formStateRef, setFormState }));

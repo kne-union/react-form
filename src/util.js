@@ -24,11 +24,11 @@ export const getFields = (data, callback) => {
           return;
         }
 
-        _set(output, `${groupName}[${targetIndex}]['${name}']`, callback(item, data[name].field));
+        _set(output, `${groupName}[${targetIndex}].${name}`, callback(item, data[name].field));
         return;
       }
 
-      output[name] = callback(item, data[name].field);
+      _set(output, `${name}`, callback(item, data[name].field));
     });
   });
 
@@ -50,6 +50,7 @@ export const parseFormData = (data, formData, interceptors) => {
   Object.keys(data).forEach(name => {
     const field = data[name].data;
     const fieldData = Object.getOwnPropertySymbols(field);
+
     fieldData.forEach(index => {
       const item = Object.assign({}, field[index]),
         groupName = item.groupName;
@@ -60,10 +61,11 @@ export const parseFormData = (data, formData, interceptors) => {
           return _get(formData, `${groupName}[${targetIndex}]`);
         }
         if (groupName) {
-          return _get(formData, `${groupName}[${targetIndex}][${name}]`);
+          return _get(formData, `${groupName}[${targetIndex}].${name}`);
         }
         return _get(formData, name);
       })();
+
       if (value !== void 0) {
         item.value = runInterceptors(interceptors, 'input', item.interceptor)(value);
         item.validate = {
