@@ -13,7 +13,7 @@ const GroupList = forwardRef(({ name, children }, ref) => {
   useEffect(() => {
     const sub = emitter.addListener('form-data-set', ({ data }) => {
       setList(() => {
-        return (data[name] || []).map((value, index) => index);
+        return (Array.isArray(data[name]) ? data[name] : []).map((value, index) => index);
       });
     });
     return () => {

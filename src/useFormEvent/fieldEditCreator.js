@@ -6,10 +6,10 @@ const fieldEditCreator =
   ({ formStateRef, setFormState, initDataRef, otherProps }) =>
   ({ name, rule, label, interceptor, value, noTrim, index, groupName, groupIndex, fieldRef }) => {
     const fieldItem = Object.assign({}, formStateRef.current[name]);
-    fieldItem.field.label = label;
     const fieldItemData = Object.assign({}, fieldItem.data[index], {
       index: groupIndex,
       SymbolIndex: index,
+      label,
       noTrim,
       groupName,
       fieldRef,

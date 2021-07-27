@@ -6,7 +6,7 @@ const Input = props => {
   return (
     <>
       {fieldProps.label}
-      <input type="text" value={fieldProps.value || ''} onChange={fieldProps.onChange} onBlur={fieldProps.triggerValidate} />
+      <input ref={fieldProps.fieldRef} type="text" value={fieldProps.value || ''} onChange={fieldProps.onChange} onBlur={fieldProps.triggerValidate} />
       {fieldProps.errState}
       {fieldProps.errMsg}
     </>
@@ -26,10 +26,16 @@ const SubmitButton = ({ children }) => {
 const Simple = () => {
   const groupListRef = useRef(null);
   const groupListRef2 = useRef(null);
+  const formRef = useRef(null);
   return (
     <Form
-      data={{ abc: [{ field1: '123zzz', field2: '22222', field3: '33333' }, { field2: '23232323' }], field: '123' }}
-      onSubmit={data => {
+      ref={formRef}
+      data={{ abc: [{ field1: '123zzz', field2: '22222', field3: '33333' }, { field2: '23232323' }], field: '' }}
+      onError={error => {
+        console.log(error[0].fieldRef.current);
+      }}
+      onSubmit={(data, args) => {
+        console.log(args);
         return new Promise(resolve => {
           setTimeout(() => {
             console.log(JSON.stringify(data));
@@ -73,6 +79,12 @@ const Simple = () => {
         </GroupList>
       </div>
       <SubmitButton>提交</SubmitButton>
+      <button
+        onClick={() => {
+          formRef.current.submit('xxxxxxx', 'aaaaa');
+        }}>
+        点击
+      </button>
     </Form>
   );
 };

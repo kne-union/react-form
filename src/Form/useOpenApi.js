@@ -6,8 +6,8 @@ const useOpenApi = ({ emitter, fields, interceptors, formState, formData, isPass
     () => {
       return {
         emitter,
-        submit: () => {
-          emitter.emit('form-submit');
+        submit: (...args) => {
+          emitter.emit('form-submit', args);
         },
         get isPass() {
           return isPass;

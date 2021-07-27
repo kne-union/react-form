@@ -13,7 +13,7 @@ const useFieldInit = ({ name, rule, label, interceptor, noTrim, value, index, gr
     return () => {
       isEmit && emitter.emit('form-field-remove', { name, index });
     };
-  }, [formIsMount, emitter, name, index, rule]);
+  }, [formIsMount, emitter, name, index]);
 
   useEffect(() => {
     if (formIsMount && groupIndex !== -1) {
@@ -26,10 +26,11 @@ const useFieldInit = ({ name, rule, label, interceptor, noTrim, value, index, gr
         index,
         groupName,
         groupIndex,
-        value
+        value,
+        fieldRef
       });
     }
-  }, [formIsMount, emitter, name, rule, label, interceptor, noTrim, index, groupName, groupIndex, value]);
+  }, [formIsMount, emitter, name, rule, label, interceptor, noTrim, index, groupName, groupIndex, value, fieldRef]);
   return fieldRef;
 };
 

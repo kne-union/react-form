@@ -15,10 +15,13 @@ const useSubmit = () => {
   return {
     isLoading,
     isPass,
-    onClick: useCallback(() => {
-      setIsLoading(true);
-      emitter.emit('form-submit');
-    }, [emitter, setIsLoading])
+    onClick: useCallback(
+      (...args) => {
+        setIsLoading(true);
+        emitter.emit('form-submit', args);
+      },
+      [emitter, setIsLoading]
+    )
   };
 };
 
