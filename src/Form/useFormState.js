@@ -1,12 +1,14 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { getFields, computedFormData, computedIsPass } from '../util';
 
-const useFormState = () => {
+const useFormState = props => {
   const [state, setState] = useState({});
   const stateRef = useRef({});
   const dataRef = useRef({});
+  const propsRef = useRef(props);
+  propsRef.current = props;
   const formData = useMemo(() => {
-    return computedFormData(state);
+    return computedFormData(state, propsRef.current.interceptors);
   }, [state]);
 
   const fields = useMemo(() => {

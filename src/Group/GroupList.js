@@ -7,10 +7,13 @@ const context = createContext({});
 
 const { Provider } = context;
 
-const GroupList = forwardRef(({ name, children }, ref) => {
+const GroupList = forwardRef(({ name, empty, children }, ref) => {
   const [list, setList] = useState([]);
-  const { emitter } = useFormContext();
+  const { initDataRef, emitter } = useFormContext();
   useEffect(() => {
+    setList(() => {
+      return (Array.isArray(initDataRef.current[name]) ? initDataRef.current[name] : []).map((value, index) => index);
+    });
     const sub = emitter.addListener('form-data-set', ({ data }) => {
       setList(() => {
         return (Array.isArray(data[name]) ? data[name] : []).map((value, index) => index);
@@ -54,15 +57,21 @@ const GroupList = forwardRef(({ name, children }, ref) => {
           onAdd,
           onRemove
         }}>
-        {list.map(key => (
-          <Group key={key} name={name}>
-            {children(key, { onAdd, onRemove })}
-          </Group>
-        ))}
+        {list.length === 0
+          ? empty
+          : list.map(key => (
+              <Group key={key} name={name}>
+                {children(key, { onAdd, onRemove })}
+              </Group>
+            ))}
       </Provider>
     </GroupRoot>
   );
 });
+
+GroupList.defaultProps = {
+  empty: null
+};
 
 GroupList.useAction = () => {
   return useContext(context);

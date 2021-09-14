@@ -30,6 +30,14 @@ const Simple = () => {
   return (
     <Form
       ref={formRef}
+      rules={{
+        RULE: (value, getFormData) => {
+          console.log(getFormData());
+          return {
+            result: true
+          };
+        }
+      }}
       data={{ abc: [{ field1: '123zzz', field2: '22222', field3: '33333' }, { field2: '23232323' }], field: '' }}
       onError={error => {
         console.log(error[0].fieldRef.current);
@@ -43,7 +51,7 @@ const Simple = () => {
           }, 1000);
         });
       }}>
-      <Input name="field" label="字段" rule="REQ LEN-0-10" />
+      <Input name="field" label="字段" rule="REQ LEN-0-10 RULE" />
       <div>
         <button
           onClick={() => {

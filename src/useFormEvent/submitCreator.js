@@ -7,7 +7,7 @@ const submitCreator = ({ formStateRef, taskQueue, otherProps, emitter }) => {
     if (!Array.isArray(args)) {
       args = [args];
     }
-    const { onPrevSubmit, onError, onSubmit } = otherProps.current;
+    const { onPrevSubmit, onError, onSubmit, interceptors } = otherProps.current;
     validateAllFields()
       .then(async () => {
         const formState = formStateRef.current;
@@ -18,7 +18,7 @@ const submitCreator = ({ formStateRef, taskQueue, otherProps, emitter }) => {
           onError && (await onError(errors, ...args));
           return false;
         }
-        const formData = computedFormData(formState);
+        const formData = computedFormData(formState, interceptors);
         emitter.emit('form-prev-submit');
         if (onPrevSubmit && (await onPrevSubmit(formData, ...args)) === false) {
           emitter.emit('form-prev-submit-error');

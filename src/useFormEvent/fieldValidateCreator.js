@@ -38,7 +38,7 @@ const fieldValidateCreator = ({ formStateRef, setFormState, otherProps, taskQueu
           value: trimValue,
           formRules: otherProps.current.rules,
           getFormData: () => {
-            computedFormData(formStateRef.current);
+            return computedFormData(formStateRef.current);
           }
         });
       },
