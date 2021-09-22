@@ -1,37 +1,30 @@
 {
-  "name": "example",
-  "version": "0.1.0",
+  "name": "react-form-example",
+  "homepage": ".",
+  "version": "0.0.0",
   "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.4.0",
-    "@testing-library/user-event": "^7.2.1",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
-    "react-scripts": "3.3.0"
-  },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "node ../node_modules/react-scripts/bin/react-scripts.js start",
+    "build": "node ../node_modules/react-scripts/bin/react-scripts.js build",
+    "test": "node ../node_modules/react-scripts/bin/react-scripts.js test",
+    "eject": "node ../node_modules/react-scripts/bin/react-scripts.js eject"
+  },
+  "dependencies": {
+    "react": "file:../node_modules/react",
+    "react-dom": "file:../node_modules/react-dom",
+    "react-scripts": "file:../node_modules/react-scripts",
+    "@kne/react-form": "file:.."
+  },
+  "devDependencies": {
+    "@babel/plugin-syntax-object-rest-spread": "^7.8.3"
   },
   "eslintConfig": {
     "extends": "react-app"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "devDependencies": {
-    "@kne/react-form": "0.1.0-alpha.0"
-  }
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

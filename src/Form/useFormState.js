@@ -1,0 +1,68 @@
+import { useState, useRef, useMemo } from 'react';
+import set from 'lodash/set';
+import { runInterceptors } from '../interceptors';
+import _last from 'lodash/last';
+import { filterEmpty } from '../empty';
+
+const useFormState = props => {
+  const [state, setState] = useState({});
+  const formStateRef = useRef([]);
+  formStateRef.current = state;
+
+  const propsRef = useRef({});
+  propsRef.current = props;
+
+  const fields = useMemo(() => {
+    return Object.values(state).map(item => {
+      return {
+        field: item.fieldRef,
+        label: item.label,
+        name: item.name,
+        rule: item.rule
+      };
+    });
+  }, [state]);
+  const isPass = useMemo(() => {
+    return Object.values(state).every(field => {
+      return field.isPass;
+    });
+  }, [state]);
+  const isPassRef = useRef(isPass);
+  isPassRef.current = isPass;
+  const formData = useMemo(() => {
+    const output = {};
+    Object.values(state).forEach(field => {
+      const fieldValue = runInterceptors(propsRef.current.interceptors, 'output', field.interceptor)(field.value);
+      if (field.groupName && _last(field.groupName.split('.')) === field.name) {
+        set(output, `${field.groupName}[${field.groupIndex}]`, fieldValue);
+        return;
+      }
+      if (field.groupName) {
+        set(output, `${field.groupName}[${field.groupIndex}].${field.name}`, fieldValue);
+        return;
+      }
+      set(output, field.name, fieldValue);
+    });
+    return props.noFilter ? output : filterEmpty(output);
+  }, [state, props.noFilter]);
+  const formDataRef = useRef({});
+  formDataRef.current = formData;
+  return {
+    fields,
+    isPass,
+    isPassRef,
+    formData,
+    formDataRef,
+    formState: state,
+    formStateRef: formStateRef,
+    setFormState: state => {
+      if (!state) {
+        debugger;
+      }
+      formStateRef.current = state;
+      setState(state);
+    }
+  };
+};
+
+export default useFormState;

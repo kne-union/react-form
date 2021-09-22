@@ -1,34 +1,28 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
-import useApi from './useApi';
+import { useState, useEffect, useCallback } from 'react';
+import { useFormContext } from './context';
 
-export default ({ onClick, ...props }) => {
-  const [isLoading, setIsLoading] = useState(false),
-    isUnmount = useRef(false);
-  const { submit, isPass } = useApi();
-
+const useSubmit = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const { isPass, emitter } = useFormContext();
   useEffect(() => {
+    const target = emitter.addListener('form-submit-complete', () => {
+      setIsLoading(false);
+    });
     return () => {
-      isUnmount.current = true;
+      target && target.remove();
     };
-  }, []);
-
-  const handlerClick = useCallback(
-    e => {
-      if (isLoading) {
-        return;
-      }
-      onClick && onClick(e);
-      setIsLoading(true);
-      submit()
-        .catch(e => {
-          console.error(e);
-        })
-        .then(() => {
-          !isUnmount.current && setIsLoading(false);
-        });
-    },
-    [submit, isLoading, setIsLoading, onClick]
-  );
-
-  return { ...props, isPass, isLoading, onClick: handlerClick };
+  }, [emitter]);
+  return {
+    isLoading,
+    isPass,
+    onClick: useCallback(
+      (...args) => {
+        setIsLoading(true);
+        emitter.emit('form-submit', args);
+      },
+      [emitter, setIsLoading]
+    )
+  };
 };
+
+export default useSubmit;
