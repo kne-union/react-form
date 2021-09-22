@@ -1,15 +1,15 @@
-import useEvent from '../useEvent';
 import { useEffect, useRef } from 'react';
+import useEvent from '@kne/use-event';
 import fieldAddCreator from './fieldAddCreator';
 import fieldEditCreator from './fieldEditCreator';
 import fieldRemoveCreator from './fieldRemoveCreator';
+import { TaskQueue } from '../common/TaskQueue';
 import fieldValidateCreator from './fieldValidateCreator';
 import fieldDataChangeCreator from './fieldDataChangeCreator';
 import dataSetCreator from './dataSetCreator';
 import dataResetCreator from './dataResetCreator';
 import dataSetFieldCreator from './dataSetFieldCreator';
 import submitCreator from './submitCreator';
-import { TaskQueue } from './TaskQueue';
 
 const usePropsRef = props => {
   const propsRef = useRef({});
@@ -19,48 +19,29 @@ const usePropsRef = props => {
   return propsRef;
 };
 
-const useFormEvent = ({ debug, interceptors, rules, formStateRef, initDataRef, setFormState, onPrevSubmit, onError, onSubmit }) => {
-  const emitter = useEvent(debug);
-  const otherProps = usePropsRef({
-    onPrevSubmit,
-    onError,
-    onSubmit,
-    rules,
-    interceptors
-  });
-  otherProps.current = {
-    onPrevSubmit,
-    onError,
-    onSubmit,
-    rules,
-    interceptors
-  };
+const useFormEvent = ({ debug, formStateRef, formDataRef, isPassRef, initDataRef, ...props }) => {
+  const emitter = useEvent({ debug, name: 'react-form' });
+  const emitterRef = useRef(emitter);
+  emitterRef.current = emitter;
+
+  const otherProps = usePropsRef(props);
+  otherProps.current = props;
+
   useEffect(() => {
+    const emitter = emitterRef.current;
+    const setFormState = otherProps.current.setFormState;
     const taskQueue = new TaskQueue();
-    emitter.addListener(
-      'form-field-add',
-      fieldAddCreator({
-        formStateRef,
-        setFormState
-      })
-    );
-    emitter.addListener(
-      'form-field-edit',
-      fieldEditCreator({
-        formStateRef,
-        initDataRef,
-        setFormState,
-        otherProps
-      })
-    );
+    emitter.addListener('form-field-add', fieldAddCreator({ formStateRef, setFormState }));
+    emitter.addListener('form-field-edit', fieldEditCreator({ formStateRef, setFormState, initDataRef, otherProps }));
     emitter.addListener('form-field-remove', fieldRemoveCreator({ formStateRef, setFormState }));
     emitter.addListener(
       'form-field-validate',
       fieldValidateCreator({
         formStateRef,
+        formDataRef,
         setFormState,
-        taskQueue,
         otherProps,
+        taskQueue,
         emitter
       })
     );
@@ -77,25 +58,23 @@ const useFormEvent = ({ debug, interceptors, rules, formStateRef, initDataRef, s
       })
     );
     emitter.addListener('form-data-reset', dataResetCreator({ initDataRef, setFormState, formStateRef }));
-    emitter.addListener('form-data-set-field', dataSetFieldCreator({ setFormState, formStateRef }));
+    emitter.addListener('form-data-set-field', dataSetFieldCreator({ setFormState, formStateRef, otherProps }));
     emitter.addListener(
       'form-submit',
       submitCreator({
         formStateRef,
+        formDataRef,
+        isPassRef,
         taskQueue,
         otherProps,
-
-        onPrevSubmit: otherProps.current.onPrevSubmit,
-        onError: otherProps.current.onError,
-        onSubmit: otherProps.current.onSubmit,
-        rules: otherProps.current.rules,
         emitter
       })
     );
     return () => {
       emitter.removeAllListeners();
     };
-  }, [emitter, formStateRef, initDataRef, otherProps, setFormState]);
+  }, [formStateRef, initDataRef, otherProps]);
+
   return emitter;
 };
 

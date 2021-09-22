@@ -1,22 +1,22 @@
-const ruleValidate = async ({ filed, value, formRules, getFormData }) => {
-  if (typeof filed.rule === 'function') {
-    return await filed.rule(value);
+const ruleValidate = async ({ field, value, formRules, getFormData }) => {
+  if (typeof field.rule === 'function') {
+    return await field.rule(value);
   }
-  if (typeof filed.rule === 'object' && filed.rule instanceof RegExp) {
+  if (typeof field.rule === 'object' && field.rule instanceof RegExp) {
     return {
-      result: filed.rule.test(value),
+      result: field.rule.test(value),
       errMsg: ''
     };
   }
-  if (typeof filed.rule === 'string') {
-    const rules = filed.rule.split(' ').filter(str => str.length > 0);
+  if (typeof field.rule === 'string') {
+    const rules = field.rule.split(' ').filter(str => str.length > 0);
     for (let currentRule of rules) {
       let [key, ...args] = currentRule.split('-');
       const exec = formRules[key.toUpperCase()];
       if (typeof exec === 'function') {
         //空值处理 如果不为REQ规则的规则REQ判断不通过返回正确
         if (currentRule !== 'REQ') {
-          const emptyRes = formRules['REQ'](value, ...args, getFormData);
+          const emptyRes = formRules['REQ'](value, ...args, getFormData());
           if (emptyRes.result !== true) {
             return {
               result: true,
@@ -25,7 +25,7 @@ const ruleValidate = async ({ filed, value, formRules, getFormData }) => {
           }
         }
 
-        const res = await exec(value, ...args, getFormData);
+        const res = await exec(value, ...args, getFormData());
         if (res.result !== true) {
           return {
             result: false,
@@ -33,7 +33,7 @@ const ruleValidate = async ({ filed, value, formRules, getFormData }) => {
           };
         }
       } else {
-        console.error(`校验规则${currentRule}不在当前form的rules里面，请确认${filed.name}的校验规则${filed.rule}是否正确`);
+        console.error(`校验规则${currentRule}不在当前form的rules里面，请确认${field.name}的校验规则${field.rule}是否正确`);
       }
     }
   }

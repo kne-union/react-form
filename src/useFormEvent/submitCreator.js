@@ -1,24 +1,34 @@
-import { computedIsPass, computedFormData, computedError } from '../util';
 import validateAllFieldsCreator from './validateAllFieldsCreator';
 
-const submitCreator = ({ formStateRef, taskQueue, otherProps, emitter }) => {
+const submitCreator = ({ formStateRef, formDataRef, isPassRef, taskQueue, otherProps, emitter }) => {
   const validateAllFields = validateAllFieldsCreator({ formStateRef, taskQueue, emitter });
   return args => {
     if (!Array.isArray(args)) {
       args = [args];
     }
-    const { onPrevSubmit, onError, onSubmit, interceptors } = otherProps.current;
+    const { onPrevSubmit, onError, onSubmit } = otherProps.current;
     validateAllFields()
       .then(async () => {
         const formState = formStateRef.current;
-        const isPass = computedIsPass(formState);
+        const isPass = isPassRef.current;
         if (!isPass) {
-          const errors = computedError(formState);
+          const errors = Object.values(formState)
+            .filter(field => {
+              return field.validate.status === 2;
+            })
+            .map(field =>
+              Object.assign({}, field.validate, {
+                name: field.name,
+                groupName: field.groupName,
+                fieldRef: field.fieldRef,
+                groupIndex: field.groupIndex
+              })
+            );
           emitter.emit('form-submit-error', errors);
           onError && (await onError(errors, ...args));
           return false;
         }
-        const formData = computedFormData(formState, interceptors);
+        const formData = formDataRef.current;
         emitter.emit('form-prev-submit');
         if (onPrevSubmit && (await onPrevSubmit(formData, ...args)) === false) {
           emitter.emit('form-prev-submit-error');

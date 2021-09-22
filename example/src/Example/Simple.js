@@ -29,10 +29,11 @@ const Simple = () => {
   const formRef = useRef(null);
   return (
     <Form
+      debug
       ref={formRef}
       rules={{
-        RULE: (value, getFormData) => {
-          console.log(getFormData());
+        RULE: (value, formData) => {
+          console.log(formData);
           return {
             result: true
           };

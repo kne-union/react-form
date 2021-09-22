@@ -1,24 +1,17 @@
-import _get from 'lodash/get';
+import { runInterceptors } from '../interceptors';
 
-const dataSetFieldCreator = ({ setFormState, formStateRef }) => ({ name, value }) => {
-  const groupName = value.groupName;
-  const groupIndex = value.groupIndex;
-  const data = Object.assign({}, formStateRef.current);
-  let fieldData = _get(data[name], 'data');
-  if (!groupName) {
-    fieldData = {};
-    Object.getOwnPropertySymbols(fieldData).forEach(index => {
-      fieldData[index] = Object.assign({}, fieldData[index], value);
-    });
-  } else {
-    const index = Object.getOwnPropertySymbols(fieldData).find(index => {
-      const data = _get(fieldData, `[${index}]`);
-      return _get(data, 'groupName') === groupName && _get(data, 'groupIndex') === groupIndex;
-    });
-    fieldData[index] = Object.assign({}, fieldData[index], value);
-  }
-
-  setFormState(Object.assign({}, data, { [name]: fieldData }));
-};
+const dataSetFieldCreator =
+  ({ setFormState, formStateRef, otherProps }) =>
+  ({ name, groupName, groupIndex, value }) => {
+    const data = Object.assign({}, formStateRef.current);
+    if (groupName) {
+      const field = data.find(field => field.name === name && field.groupName === groupName && field.groupIndex === groupIndex);
+      data[field.id] = field.clone().setValue(runInterceptors(otherProps.current.interceptors, 'input', field.interceptor)(value));
+    } else {
+      const field = data.find(field => field.name === name);
+      data[field.id] = field.clone().setValue(runInterceptors(otherProps.current.interceptors, 'input', field.interceptor)(value));
+    }
+    setFormState(data);
+  };
 
 export default dataSetFieldCreator;

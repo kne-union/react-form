@@ -13,14 +13,15 @@ const useField = ({ name, rule, label, interceptor, noTrim, debounce: time = 0, 
   const groupName = _get(_group, 'name');
   const groupIndex = _get(_group, 'index');
   const { formState, formData } = useFormContext();
-  const index = useMemo(() => Symbol(uniqueId(`${name}_`)), [name]);
-  const field = _get(formState, `${name}`);
-  const fieldData = _get(field, 'data', {})[index];
-  const fieldRef = useFieldInit({ name, rule, label, interceptor, noTrim, value, index, groupName, groupIndex });
-  const validate = useValidate({ name, index, time });
-  const { isValueChanged, onChange: dataChange } = useFieldDataChange({ name, index, onChange });
+  const id = useMemo(() => uniqueId(`${name}_`), [name]);
+  const field = _get(formState, id);
+
+  const fieldRef = useFieldInit({ name, rule, label, interceptor, noTrim, value, id, groupName, groupIndex });
+  const validate = useValidate({ name, id, time });
+  const { isValueChanged, onChange: dataChange } = useFieldDataChange({ name, id, onChange });
   return {
     ...args,
+    id,
     name,
     label,
     fieldRef,
@@ -31,10 +32,10 @@ const useField = ({ name, rule, label, interceptor, noTrim, debounce: time = 0, 
     groupIndex,
     onChange: dataChange,
     isValueChanged,
-    value: _get(fieldData, 'value'),
+    value: _get(field, 'value'),
     triggerValidate: validate,
-    errState: _get(fieldData, 'validate.status', 0),
-    errMsg: compileErrMsg(errMsg || _get(fieldData, 'validate.msg', ''), label)
+    errState: _get(field, 'validate.status', 0),
+    errMsg: compileErrMsg(errMsg || _get(field, 'validate.msg', ''), label)
   };
 };
 

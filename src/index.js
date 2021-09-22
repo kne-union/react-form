@@ -3,10 +3,8 @@ import { isNotEmpty, isEmpty, filterEmpty } from './empty';
 
 export default Form;
 export { default as useField } from './useField';
-export { default as useEmitter } from './useEmitter';
 export { default as useReset } from './useReset';
 export { default as useSubmit } from './useSubmit';
-export { default as useFieldInfo } from './useFieldInfo';
 export { default as Group } from './Group';
 export { default as GroupList } from './Group/GroupList';
 export { useFormContext } from './context';

@@ -38,6 +38,7 @@ export class TaskQueue {
     const proxyTaskComplete = new Proxy(taskConfig.complete, {
       apply: (target, thisArg, argumentsList) => {
         const res = target.apply(thisArg, argumentsList);
+        const index = this.queue.indexOf(task);
         this.queue.splice(index, 1);
         return res;
       }
@@ -51,7 +52,7 @@ export class TaskQueue {
       currentTask.cancel();
       this.queue.splice(currentIndex, 1);
     }
-    const index = this.queue.push(task);
+    this.queue.push(task);
   }
 }
 

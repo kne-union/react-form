@@ -1,11 +1,10 @@
-const validateAllFieldsCreator = ({ formStateRef, taskQueue, emitter }) => () => {
-  Object.keys(formStateRef.current).forEach(name => {
-    const field = formStateRef.current[name];
-    Object.getOwnPropertySymbols(field.data).forEach(index => {
-      emitter.emit('form-field-validate', { name, index });
+const validateAllFieldsCreator =
+  ({ formStateRef, taskQueue, emitter }) =>
+  () => {
+    Object.values(formStateRef.current).forEach(field => {
+      emitter.emit('form-field-validate', { id: field.id });
     });
-  });
-  return Promise.all(taskQueue.queue.map(task => task.target));
-};
+    return Promise.all(taskQueue.queue.map(task => task.target));
+  };
 
 export default validateAllFieldsCreator;

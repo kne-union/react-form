@@ -1,42 +1,48 @@
-import React, { useRef, forwardRef, useEffect, useState } from 'react';
+import React, { forwardRef, useRef, useState, useEffect, useImperativeHandle } from 'react';
 import { Provider } from '../context';
-import RULES from '../RULES';
-import useFormEvent from '../useFormEvent';
 import useFormState from './useFormState';
+import useFormEvent from '../useFormEvent';
 import useOpenApi from './useOpenApi';
+import RULES from '../RULES';
 import { GroupRoot } from '../Group';
 
 const Form = forwardRef((props, ref) => {
-  const { onPrevSubmit, rules, interceptors, noFilter, data, onError, onSubmit, debug, children } = props;
-  const { formState, formStateRef, formData, fields, isPass, formDataRef, setFormState } = useFormState(props);
+  const { formState, formStateRef, formData, fields, isPass, isPassRef, formDataRef, setFormState } = useFormState(props);
+  const initDataRef = useRef(props.data);
+
   const [formIsMount, setFormIsMount] = useState(false);
-  const formRules = Object.assign({}, RULES, rules);
-  const initDataRef = useRef(data);
+  const formRules = Object.assign({}, RULES, props.rules);
   const emitter = useFormEvent({
-    onPrevSubmit,
+    onPrevSubmit: props.onPrevSubmit,
     rules: formRules,
-    interceptors,
-    noFilter,
-    data,
-    onError,
-    onSubmit,
-    debug,
+    interceptors: props.interceptors,
+    noFilter: props.noFilter,
+    onError: props.onError,
+    onSubmit: props.onSubmit,
+    debug: props.debug,
     formState,
     formStateRef,
     formData,
+    isPassRef,
     formDataRef,
     setFormState,
     initDataRef
   });
+  const emitterRef = useRef(emitter);
+  emitterRef.current = emitter;
+
   useEffect(() => {
     setFormIsMount(true);
-    initDataRef.current && emitter.emit('form-data-set', { data: initDataRef.current });
-    emitter.emit('form-mount');
+    initDataRef.current && emitterRef.current.emit('form-data-set', { data: initDataRef.current });
+    emitterRef.current.emit('form-mount');
     return () => {
-      emitter.emit('form-unmount');
+      emitterRef.current.emit('form-unmount');
     };
-  }, [emitter]);
-  useOpenApi({ emitter, fields, interceptors, isPass, formData, formState }, ref);
+  }, []);
+
+  const openApi = useOpenApi({ emitter, fields, formState, formData, isPass });
+  useImperativeHandle(ref, () => openApi, [openApi]);
+
   return (
     <Provider
       value={{
@@ -47,9 +53,10 @@ const Form = forwardRef((props, ref) => {
         fields,
         isPass,
         formIsMount,
-        initDataRef
+        initDataRef,
+        openApi
       }}>
-      <GroupRoot>{children}</GroupRoot>
+      <GroupRoot>{props.children}</GroupRoot>
     </Provider>
   );
 });

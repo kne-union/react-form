@@ -18,12 +18,18 @@ export const isNotEmpty = value => {
 export const isEmpty = value => !isNotEmpty(value);
 
 export const filterEmpty = (value = {}) => {
-  const output = {};
-  Object.keys(value).forEach(key => {
-    const current = value[key];
-    if (isNotEmpty(current)) {
-      output[key] = current;
-    }
-  });
-  return output;
+  if (isArray(value)) {
+    return value.map(item => filterEmpty(item));
+  }
+  if (isPlainObject(value)) {
+    const output = {};
+    Object.keys(value).forEach(key => {
+      const current = filterEmpty(value[key]);
+      if (isNotEmpty(current)) {
+        output[key] = current;
+      }
+    });
+    return output;
+  }
+  return value;
 };

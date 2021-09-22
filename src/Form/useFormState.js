@@ -1,52 +1,67 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { getFields, computedFormData, computedIsPass } from '../util';
+import { useState, useRef, useMemo } from 'react';
+import set from 'lodash/set';
+import { runInterceptors } from '../interceptors';
+import _last from 'lodash/last';
+import { filterEmpty } from '../empty';
 
 const useFormState = props => {
   const [state, setState] = useState({});
-  const stateRef = useRef({});
-  const dataRef = useRef({});
-  const propsRef = useRef(props);
+  const formStateRef = useRef([]);
+  formStateRef.current = state;
+
+  const propsRef = useRef({});
   propsRef.current = props;
-  const formData = useMemo(() => {
-    return computedFormData(state, propsRef.current.interceptors);
-  }, [state]);
 
   const fields = useMemo(() => {
-    return getFields(state, (item, field) => {
+    return Object.values(state).map(item => {
       return {
-        field: item,
-        label: field.label,
-        name: field.name,
-        rule: field.rule
+        field: item.fieldRef,
+        label: item.label,
+        name: item.name,
+        rule: item.rule
       };
     });
   }, [state]);
   const isPass = useMemo(() => {
-    return computedIsPass(state);
+    return Object.values(state).every(field => {
+      return field.isPass;
+    });
   }, [state]);
-  const setFormState = useCallback(state => {
-    if (typeof state === 'function') {
-      setState(oldState => {
-        const newState = state(oldState);
-        stateRef.current = newState;
-        return newState;
-      });
-    } else {
-      stateRef.current = state;
-      setState(state);
-    }
-  }, []);
-  stateRef.current = state;
-  dataRef.current = formData;
-
+  const isPassRef = useRef(isPass);
+  isPassRef.current = isPass;
+  const formData = useMemo(() => {
+    const output = {};
+    Object.values(state).forEach(field => {
+      const fieldValue = runInterceptors(propsRef.current.interceptors, 'output', field.interceptor)(field.value);
+      if (field.groupName && _last(field.groupName.split('.')) === field.name) {
+        set(output, `${field.groupName}[${field.groupIndex}]`, fieldValue);
+        return;
+      }
+      if (field.groupName) {
+        set(output, `${field.groupName}[${field.groupIndex}].${field.name}`, fieldValue);
+        return;
+      }
+      set(output, field.name, fieldValue);
+    });
+    return props.noFilter ? output : filterEmpty(output);
+  }, [state, props.noFilter]);
+  const formDataRef = useRef({});
+  formDataRef.current = formData;
   return {
-    formState: state,
-    formStateRef: stateRef,
-    formData,
     fields,
     isPass,
-    formDataRef: dataRef,
-    setFormState
+    isPassRef,
+    formData,
+    formDataRef,
+    formState: state,
+    formStateRef: formStateRef,
+    setFormState: state => {
+      if (!state) {
+        debugger;
+      }
+      formStateRef.current = state;
+      setState(state);
+    }
   };
 };
 
