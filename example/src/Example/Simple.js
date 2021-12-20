@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import Form, { useField, useSubmit, GroupList } from '@kne/react-form';
+import Form, { useField, useSubmit, useReset, GroupList } from '@kne/react-form';
 
 const Input = props => {
   const fieldProps = useField(props);
@@ -21,6 +21,11 @@ const SubmitButton = ({ children }) => {
       {isLoading ? '正在提交中...' : ''}
     </button>
   );
+};
+
+const ResetButton = () => {
+  const { onClick } = useReset();
+  return <button onClick={onClick}>重置</button>;
 };
 
 const Simple = () => {
@@ -90,10 +95,14 @@ const Simple = () => {
       <SubmitButton>提交</SubmitButton>
       <button
         onClick={() => {
-          formRef.current.submit('xxxxxxx', 'aaaaa');
+          formRef.current.emitter.emit('form-data-set-field', {
+            name: 'field',
+            value: 'zzzzzzzzzz'
+          });
         }}>
         点击
       </button>
+      <ResetButton>重置</ResetButton>
     </Form>
   );
 };

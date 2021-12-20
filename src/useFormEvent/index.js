@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import useEvent from '@kne/use-event';
 import fieldAddCreator from './fieldAddCreator';
 import fieldEditCreator from './fieldEditCreator';
@@ -19,7 +19,7 @@ const usePropsRef = props => {
   return propsRef;
 };
 
-const useFormEvent = ({ debug, formStateRef, formDataRef, isPassRef, initDataRef, ...props }) => {
+const useFormEvent = ({ debug, formStateRef, formData, formDataRef, isPassRef, initDataRef, ...props }) => {
   const emitter = useEvent({ debug, name: 'react-form' });
   const emitterRef = useRef(emitter);
   emitterRef.current = emitter;
@@ -74,6 +74,10 @@ const useFormEvent = ({ debug, formStateRef, formDataRef, isPassRef, initDataRef
       emitter.removeAllListeners();
     };
   }, [formStateRef, initDataRef, otherProps]);
+
+  useMemo(() => {
+    emitterRef.current.emit('form-data-change', { data: formData });
+  }, [formData]);
 
   return emitter;
 };
