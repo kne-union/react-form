@@ -57,7 +57,7 @@ const Simple = () => {
           }, 1000);
         });
       }}>
-      <Input name="field" label="字段" rule="REQ LEN-0-10 RULE" />
+      <Input name="field" label="字段" rule="REQ LEN-0-10 RULE" value="11111" />
       <div>
         <button
           onClick={() => {
