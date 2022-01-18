@@ -32,6 +32,9 @@ const useFormState = props => {
   const formData = useMemo(() => {
     const output = {};
     Object.values(state).forEach(field => {
+      if (!field.name) {
+        return;
+      }
       const fieldValue = runInterceptors(propsRef.current.interceptors, 'output', field.interceptor)(field.value);
       if (field.groupName && _last(field.groupName.split('.')) === field.name) {
         set(output, `${field.groupName}[${field.groupIndex}]`, fieldValue);

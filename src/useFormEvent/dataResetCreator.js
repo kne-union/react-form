@@ -4,9 +4,10 @@ const dataResetCreator =
     initDataRef.current = {};
     const data = Object.assign({}, formStateRef.current);
     const output = {};
-    Object.keys(data).forEach(item => {
+    Object.values(data).forEach(item => {
       const field = item.clone();
       field.deleteValue();
+      field.validate = {};
       output[item.id] = field;
     });
     setFormState(output);
