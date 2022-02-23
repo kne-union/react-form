@@ -59,9 +59,6 @@ const useFormState = props => {
     formState: state,
     formStateRef: formStateRef,
     setFormState: state => {
-      if (!state) {
-        debugger;
-      }
       formStateRef.current = state;
       setState(state);
     }
