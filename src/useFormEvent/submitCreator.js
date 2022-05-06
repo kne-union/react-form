@@ -16,14 +16,9 @@ const submitCreator = ({ formStateRef, formDataRef, isPassRef, taskQueue, otherP
             .filter(field => {
               return field.validate.status === 2;
             })
-            .map(field =>
-              Object.assign({}, field.validate, {
-                name: field.name,
-                groupName: field.groupName,
-                fieldRef: field.fieldRef,
-                groupIndex: field.groupIndex
-              })
-            );
+            .map(field => Object.assign({}, field.validate, {
+              name: field.name, groupName: field.groupName, fieldRef: field.fieldRef, groupIndex: field.groupIndex
+            }));
           emitter.emit('form-submit-error', errors);
           onError && (await onError(errors, ...args));
           return false;
@@ -38,15 +33,13 @@ const submitCreator = ({ formStateRef, formDataRef, isPassRef, taskQueue, otherP
         emitter.emit('form-submit-success', formData);
         return true;
       })
-      .then(
-        res => {
-          emitter.emit('form-submit-end', res);
-        },
-        e => {
-          console.error(e);
-          emitter.emit('form-error', e);
-        }
-      )
+      .then(res => {
+        emitter.emit('form-submit-end', res);
+      }, e => {
+        console.error(e);
+        emitter.emit('form-error', e);
+        return onError && (onError(e, ...args));
+      })
       .then(() => {
         emitter.emit('form-submit-complete');
       });
