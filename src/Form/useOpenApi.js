@@ -3,39 +3,29 @@ import { useMemo } from 'react';
 const useOpenApi = ({ emitter, fields, formState, formData, isPass }) => {
   return useMemo(() => {
     return {
-      emitter,
-      submit: (...args) => {
+      emitter, submit: (...args) => {
         emitter.emit('form-submit', args);
-      },
-      get isPass() {
+      }, get isPass() {
         return isPass;
-      },
-      get data() {
+      }, get data() {
         return formData;
-      },
-      get fields() {
+      }, get fields() {
         return fields;
-      },
-      get formState() {
+      }, get formState() {
         return formState;
-      },
-      set data(data) {
+      }, set data(data) {
         emitter.emit('form-data-set', { data });
-      },
-      reset() {
+      }, reset() {
         emitter.emit('form-data-reset');
-      },
-      onReady(callback) {
+      }, onReady(callback) {
         emitter.addListener('form-mount', () => {
           callback && callback();
         });
-      },
-      onDestroy(callback) {
+      }, onDestroy(callback) {
         emitter.addListener('form-unmount', () => {
           callback && callback();
         });
-      },
-      validateField(name, groupName) {
+      }, validateField(name, groupName) {
         const field = formState[name];
         const index = Object.getOwnPropertySymbols(field.data).find(index => {
           const item = field.data[index];
@@ -46,14 +36,14 @@ const useOpenApi = ({ emitter, fields, formState, formData, isPass }) => {
           return;
         }
         emitter.emit('form-field-validate', { name, index });
-      },
-      setFieldValidate({ name, value, groupName, groupIndex }) {
+      }, setFormData: (data, runValidate = true) => {
+        emitter.emit('form-data-set', { data, runValidate });
+      }, getFormData() {
+        return formData;
+      }, setFieldValidate({ name, value, groupName, groupIndex }) {
         emitter.emit('form-data-set-field', {
-          name,
-          value: {
-            groupName,
-            groupIndex,
-            validate: value
+          name, value: {
+            groupName, groupIndex, validate: value
           }
         });
       }

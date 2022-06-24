@@ -12,23 +12,19 @@ const fieldValidateCreator = ({ formStateRef, formDataRef, setFormState, otherPr
     if (typeof field.value === 'string' && field.noTrim !== true) {
       trimValue = field.value.trim();
       if (field.value !== trimValue) {
+        field.setValue(trimValue);
         emitter.emit('form-field-data-change', { id, value: trimValue });
       }
     }
+    const formData = formDataRef.current;
     //添加任务
     taskQueue.append({
-      id,
-      runner: () => {
+      id, runner: () => {
         return field.runValidate(otherProps.current.rules, () => formDataRef.current);
-      },
-      complete: () => {
+      }, complete: () => {
         setFieldInfo(field);
         emitter.emit('form-field-validate-complete', {
-          id,
-          name: field.name,
-          value: trimValue,
-          index: field.groupIndex,
-          validate: field.validate
+          id, name: field.name, value: trimValue, index: field.groupIndex, validate: field.validate
         });
       }
     });

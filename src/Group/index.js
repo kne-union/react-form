@@ -6,7 +6,7 @@ import _get from 'lodash/get';
 
 const Group = ({ name, children }) => {
   const { formIsMount, emitter } = useFormContext();
-  const groupId = useMemo(() => Symbol(uniqueId(`group_`)), []);
+  const groupId = useMemo(() => uniqueId(`group_`), []);
   const { id: parentId, index: parentIndex, groupMap, name: parentName } = useGroupContext();
 
   const index = useMemo(() => {
@@ -24,7 +24,7 @@ const Group = ({ name, children }) => {
     let isEmit = false;
     if (formIsMount) {
       isEmit = true;
-      emitter.emit('form-group-add', { id: groupId, parentId });
+      emitter.emit('form-group-add', { id: groupId, parentId, name });
     }
     return () => {
       isEmit && emitter.emit('form-group-remove', { id: groupId, parentId });

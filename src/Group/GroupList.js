@@ -1,7 +1,10 @@
-import React, { useState, createContext, useEffect, useCallback, useContext, useImperativeHandle, forwardRef } from 'react';
+import React, {
+  useState, useRef, useMemo, createContext, useEffect, useCallback, useContext, useImperativeHandle, forwardRef
+} from 'react';
 import { useFormContext } from '../context';
 import Group from './index';
-import GroupRoot from './GroupRoot';
+import { useGroupContext } from './context';
+import get from 'lodash/get';
 
 const context = createContext({});
 
@@ -10,27 +13,41 @@ const { Provider } = context;
 const GroupList = forwardRef(({ name, empty, children }, ref) => {
   const [list, setList] = useState([]);
   const { initDataRef, emitter } = useFormContext();
+  const groupInfo = useGroupContext() || {};
+  const { name: parentName, index: parentIndex } = groupInfo;
+  const groupName = useMemo(() => {
+    if (parentIndex > -1 && parentName) {
+      return `${parentName}[${parentIndex}]`;
+    }
+    return '';
+  }, [parentName, parentIndex]);
+  const groupInfoRef = useRef(groupInfo);
+  groupInfoRef.current = groupInfo;
+
   useEffect(() => {
     setList(() => {
-      return (Array.isArray(initDataRef.current[name]) ? initDataRef.current[name] : []).map((value, index) => index);
+      const parentId = groupInfoRef.current.id;
+      const value = get(initDataRef.current, groupName ? `${groupName}.${name}` : name);
+      return (Array.isArray(value) ? value : []).map((value, index) => parentId ? `${parentId}-${index}` : index);
     });
     const sub = emitter.addListener('form-data-set', ({ data }) => {
+      const parentId = groupInfoRef.current.id;
       setList(() => {
-        return (Array.isArray(data[name]) ? data[name] : []).map((value, index) => index);
+        const value = get(data, groupName ? `${groupName}.${name}` : name);
+        return (Array.isArray(value) ? value : []).map((value, index) => parentId ? `${parentId}-${index}` : index);
       });
     });
     return () => {
       sub.remove();
     };
-  }, [emitter, name]);
+  }, [emitter, groupName, name]);
 
   const onAdd = useCallback(() => {
+    const parentId = groupInfoRef.current.id;
     setList(list => {
-      if (list.length === 0) {
-        return [0];
-      }
       const newList = list.slice(0);
-      newList.push(list[list.length - 1] + 1);
+      const index = list.length;
+      newList.push(parentId ? `${parentId}-${index}` : index);
       return newList;
     });
   }, []);
@@ -46,27 +63,17 @@ const GroupList = forwardRef(({ name, empty, children }, ref) => {
 
   useImperativeHandle(ref, () => {
     return {
-      onAdd,
-      onRemove
+      onAdd, onRemove
     };
   });
-  return (
-    <GroupRoot>
-      <Provider
-        value={{
-          onAdd,
-          onRemove
-        }}>
-        {list.length === 0
-          ? empty
-          : list.map(key => (
-              <Group key={key} name={name}>
-                {children(key, { onAdd, onRemove })}
-              </Group>
-            ))}
-      </Provider>
-    </GroupRoot>
-  );
+  return <Provider
+    value={{
+      onAdd, onRemove
+    }}>
+    {list.length === 0 ? empty : list.map((key, index) => (<Group key={key} name={name}>
+      {children(key, { index, onAdd, onRemove })}
+    </Group>))}
+  </Provider>;
 });
 
 GroupList.defaultProps = {

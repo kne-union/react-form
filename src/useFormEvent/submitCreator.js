@@ -1,6 +1,6 @@
 import validateAllFieldsCreator from './validateAllFieldsCreator';
 
-const submitCreator = ({ formStateRef, formDataRef, isPassRef, taskQueue, otherProps, emitter }) => {
+const submitCreator = ({ formStateRef, formDataRef, computedIsPassRef, taskQueue, otherProps, emitter }) => {
   const validateAllFields = validateAllFieldsCreator({ formStateRef, taskQueue, emitter });
   return args => {
     if (!Array.isArray(args)) {
@@ -10,7 +10,7 @@ const submitCreator = ({ formStateRef, formDataRef, isPassRef, taskQueue, otherP
     validateAllFields()
       .then(async () => {
         const formState = formStateRef.current;
-        const isPass = isPassRef.current;
+        const isPass = computedIsPassRef.current(formState);
         if (!isPass) {
           const errors = Object.values(formState)
             .filter(field => {

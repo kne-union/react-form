@@ -18,7 +18,9 @@ const useSubmit = () => {
     onClick: useCallback(
       (...args) => {
         setIsLoading(true);
-        emitter.emit('form-submit', args);
+        setTimeout(()=>{
+          emitter.emit('form-submit', args);
+        },0);
       },
       [emitter, setIsLoading]
     )

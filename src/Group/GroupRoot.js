@@ -1,10 +1,11 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import uniqueId from 'lodash/uniqueId';
-import { Provider } from './context';
+import { Provider, useGroupContext } from './context';
 import { useFormContext } from '../context';
 
 const GroupRoot = ({ children }) => {
-  const groupId = useMemo(() => Symbol(uniqueId(`group_`)), []);
+  const groupId = useMemo(() => uniqueId(`group_`), []);
+  const groupInfo = useGroupContext();
   const [groupMap, setGroupMap] = useState({});
   const { emitter } = useFormContext();
   useEffect(() => {
@@ -35,7 +36,7 @@ const GroupRoot = ({ children }) => {
       sub2.remove();
     };
   }, [emitter]);
-  return <Provider value={{ id: groupId, groupMap }}>{children}</Provider>;
+  return <Provider value={Object.assign({}, groupInfo, { id: groupId, groupMap })}>{children}</Provider>;
 };
 
 export default GroupRoot;
