@@ -40,11 +40,13 @@ const useOpenApi = ({ emitter, fields, formState, formData, isPass }) => {
         emitter.emit('form-data-set', { data, runValidate });
       }, getFormData() {
         return formData;
-      }, setFieldValidate({ name, value, groupName, groupIndex }) {
-        emitter.emit('form-data-set-field', {
-          name, value: {
-            groupName, groupIndex, validate: value
-          }
+      }, setFieldValidate({ name, validate, groupName, groupIndex }) {
+        emitter.emit('form-data-set-field-validate', { name, groupName, groupIndex, validate });
+      }, setField({ name, value, groupName, groupIndex }) {
+        emitter.emit('form-data-set-field', { name, groupName, groupIndex, value });
+      }, setFields(list) {
+        list.forEach(({ name, value, groupName, groupIndex }) => {
+          emitter.emit('form-data-set-field', { name, groupName, groupIndex, value });
         });
       }
     };

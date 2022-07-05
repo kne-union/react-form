@@ -1,8 +1,22 @@
 import React, { useRef, useEffect } from 'react';
 import { Input, SubmitButton, ResetButton } from './Base';
-import Form, { GroupList } from '@kne/react-form';
+import Form, { GroupList, useFormContext } from '@kne/react-form';
+
+const FormInfo = () => {
+  const { formData } = useFormContext();
+  //console.log(formData);
+  return null;
+};
+
+const InputComputed = () => {
+  const { formData } = useFormContext();
+  return <Input name="field3" label="字段3" onChange={() => {
+    console.log('>>>>>>', formData);
+  }}/>;
+};
 
 const GroupInner = () => {
+  const { formData } = useFormContext();
   const groupListRef2 = useRef(null);
   return <>
     <div>
@@ -14,8 +28,10 @@ const GroupInner = () => {
       </button>
       <GroupList ref={groupListRef2} name="group2">
         {(key, { onRemove }) => (<div>
-          <Input name="field2" label="字段"/>
-          <Input name="field3" label="字段3"/>
+          <Input name="field2" label="字段" onChange={() => {
+            console.log('222222', formData);
+          }}/>
+          <InputComputed/>
           <button onClick={() => onRemove(key)}>删除</button>
           <div>>>>>>>>>>>>>>>>>></div>
         </div>)}
@@ -36,7 +52,7 @@ const Simple2 = () => {
         'field2': '3333'
       }]
     }, {
-      'field': '124', 'field3': 'field3', 'group2': [{
+      'field': '124', 'group2': [{
         'field2': '222'
       }, {
         'field2': '333'
@@ -47,6 +63,7 @@ const Simple2 = () => {
   }} onSubmit={(data) => {
     console.log(data);
   }}>
+    <FormInfo/>
     <div>
       <button
         onClick={() => {

@@ -19,7 +19,7 @@ export const isEmpty = value => !isNotEmpty(value);
 
 export const filterEmpty = (value = {}) => {
   if (isArray(value)) {
-    return value.map(item => filterEmpty(item));
+    return value.map(item => filterEmpty(item)).filter(isNotEmpty);
   }
   if (isPlainObject(value)) {
     const output = {};

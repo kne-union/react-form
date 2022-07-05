@@ -2,7 +2,6 @@ import { useState, useRef, useMemo } from 'react';
 import set from 'lodash/set';
 import { runInterceptors } from '../interceptors';
 import _last from 'lodash/last';
-import { filterEmpty } from '../empty';
 
 const useFormState = props => {
   const [state, setState] = useState({});
@@ -44,8 +43,8 @@ const useFormState = props => {
       }
       set(output, field.name, fieldValue);
     });
-    return props.noFilter ? output : filterEmpty(output);
-  }, [state, props.noFilter]);
+    return output;
+  }, [state]);
   const formDataRef = useRef({});
   formDataRef.current = formData;
   return {

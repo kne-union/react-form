@@ -43,7 +43,7 @@ const Form = forwardRef((props, ref) => {
     };
   }, []);
 
-  const openApi = useOpenApi({ emitter, fields, formState, formData, isPass });
+  const openApi = useOpenApi({ emitter, fields, formState, setFormState, formData, isPass });
   useImperativeHandle(ref, () => openApi, [openApi]);
 
   return (<Provider

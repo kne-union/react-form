@@ -2,6 +2,7 @@ import React, { useMemo, useEffect, useState } from 'react';
 import uniqueId from 'lodash/uniqueId';
 import { Provider, useGroupContext } from './context';
 import { useFormContext } from '../context';
+import groupKey from './groupKey';
 
 const GroupRoot = ({ children }) => {
   const groupId = useMemo(() => uniqueId(`group_`), []);
@@ -9,25 +10,27 @@ const GroupRoot = ({ children }) => {
   const [groupMap, setGroupMap] = useState({});
   const { emitter } = useFormContext();
   useEffect(() => {
-    const sub1 = emitter.addListener('form-group-add', ({ id, parentId }) => {
+    const sub1 = emitter.addListener('form-group-add', ({ id, parentId, name }) => {
       setGroupMap(oldGroupMap => {
         const newGroupMap = Object.assign({}, oldGroupMap);
-        if (!newGroupMap[parentId]) {
-          newGroupMap[parentId] = [];
+        const key = groupKey(parentId, name);
+        if (!newGroupMap[key]) {
+          newGroupMap[key] = [];
         }
-        const newList = newGroupMap[parentId].slice(0);
+        const newList = newGroupMap[key].slice(0);
         newList.push(id);
-        newGroupMap[parentId] = newList;
+        newGroupMap[key] = newList;
         return newGroupMap;
       });
     });
-    const sub2 = emitter.addListener('form-group-remove', ({ id, parentId }) => {
+    const sub2 = emitter.addListener('form-group-remove', ({ id, parentId, name }) => {
       setGroupMap(oldGroupMap => {
         const newGroupMap = Object.assign({}, oldGroupMap);
-        const newList = newGroupMap[parentId].slice(0);
+        const key = groupKey(parentId, name);
+        const newList = newGroupMap[key].slice(0);
         const index = newList.indexOf(id);
         newList.splice(index, 1);
-        newGroupMap[parentId] = newList;
+        newGroupMap[key] = newList;
         return newGroupMap;
       });
     });

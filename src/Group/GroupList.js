@@ -5,6 +5,7 @@ import { useFormContext } from '../context';
 import Group from './index';
 import { useGroupContext } from './context';
 import get from 'lodash/get';
+import last from 'lodash/last';
 
 const context = createContext({});
 
@@ -23,7 +24,8 @@ const GroupList = forwardRef(({ name, empty, children }, ref) => {
   }, [parentName, parentIndex]);
   const groupInfoRef = useRef(groupInfo);
   groupInfoRef.current = groupInfo;
-
+  const dataRouter = useRef();
+  dataRouter.current = groupName ? `${groupName}.${name}` : name;
   useEffect(() => {
     setList(() => {
       const parentId = groupInfoRef.current.id;
@@ -45,8 +47,11 @@ const GroupList = forwardRef(({ name, empty, children }, ref) => {
   const onAdd = useCallback(() => {
     const parentId = groupInfoRef.current.id;
     setList(list => {
+      if (list.length === 0) {
+        return [`${parentId}-0`];
+      }
       const newList = list.slice(0);
-      const index = list.length;
+      const index = last(last(list).split('-')) + 1;
       newList.push(parentId ? `${parentId}-${index}` : index);
       return newList;
     });
@@ -55,6 +60,10 @@ const GroupList = forwardRef(({ name, empty, children }, ref) => {
   const onRemove = useCallback(key => {
     setList(list => {
       const index = list.indexOf(key);
+      const target = get(initDataRef.current, dataRouter.current);
+      if (Array.isArray(target)) {
+        target.splice(index, 1);
+      }
       const newList = list.slice(0);
       newList.splice(index, 1);
       return newList;

@@ -1,4 +1,5 @@
 import validateAllFieldsCreator from './validateAllFieldsCreator';
+import { filterEmpty } from '../empty';
 
 const submitCreator = ({ formStateRef, formDataRef, computedIsPassRef, taskQueue, otherProps, emitter }) => {
   const validateAllFields = validateAllFieldsCreator({ formStateRef, taskQueue, emitter });
@@ -6,7 +7,7 @@ const submitCreator = ({ formStateRef, formDataRef, computedIsPassRef, taskQueue
     if (!Array.isArray(args)) {
       args = [args];
     }
-    const { onPrevSubmit, onError, onSubmit } = otherProps.current;
+    const { onPrevSubmit, onError, onSubmit, noFilter } = otherProps.current;
     validateAllFields()
       .then(async () => {
         const formState = formStateRef.current;
@@ -23,7 +24,7 @@ const submitCreator = ({ formStateRef, formDataRef, computedIsPassRef, taskQueue
           onError && (await onError(errors, ...args));
           return false;
         }
-        const formData = formDataRef.current;
+        const formData = noFilter === true ? formDataRef.current : filterEmpty(formDataRef.current);
         emitter.emit('form-prev-submit');
         if (onPrevSubmit && (await onPrevSubmit(formData, ...args)) === false) {
           emitter.emit('form-prev-submit-error');
