@@ -80,7 +80,7 @@ const GroupList = forwardRef(({ name, empty, children }, ref) => {
       onAdd, onRemove
     }}>
     {list.length === 0 ? empty : list.map((key, index) => (<Group key={key} name={name}>
-      {children(key, { index, onAdd, onRemove })}
+      {children(key, { index, onAdd, onRemove: () => onRemove(key) })}
     </Group>))}
   </Provider>;
 });
