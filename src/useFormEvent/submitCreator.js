@@ -1,5 +1,7 @@
 import validateAllFieldsCreator from './validateAllFieldsCreator';
 import { filterEmpty } from '../empty';
+import compileErrMsg from '../common/compileErrMsg';
+import _get from 'lodash/get';
 
 const submitCreator = ({ formStateRef, formDataRef, computedIsPassRef, taskQueue, otherProps, emitter }) => {
   const validateAllFields = validateAllFieldsCreator({ formStateRef, taskQueue, emitter });
@@ -17,9 +19,16 @@ const submitCreator = ({ formStateRef, formDataRef, computedIsPassRef, taskQueue
             .filter(field => {
               return field.validate.status === 2;
             })
-            .map(field => Object.assign({}, field.validate, {
-              name: field.name, groupName: field.groupName, fieldRef: field.fieldRef, groupIndex: field.groupIndex
-            }));
+            .map(field => {
+              return Object.assign({}, field.validate, {
+                name: field.name,
+                label: field.label,
+                groupName: field.groupName,
+                fieldRef: field.fieldRef,
+                groupIndex: field.groupIndex,
+                errMsg: compileErrMsg(field.errMsg || _get(field, 'validate.msg', ''), field.label)
+              });
+            });
           emitter.emit('form-submit-error', errors);
           onError && (await onError(errors, ...args));
           return false;

@@ -2,22 +2,11 @@ import React, { useRef, useEffect } from 'react';
 import Form, { GroupList, useFormContext } from '@kne/react-form';
 import { Input, SubmitButton, ResetButton } from './Base';
 
-const EventTest = () => {
-  const { emitter } = useFormContext();
-  useEffect(() => {
-    emitter.addListener('form-submit-success', (data) => {
-      console.log('>>>>>>>>---------form-submit-success', data);
-    });
-  }, [emitter]);
-  return null;
-};
-
 const Simple = () => {
   const groupListRef = useRef(null);
   const groupListRef2 = useRef(null);
   const formRef = useRef(null);
   return (<Form
-    debug
     ref={formRef}
     rules={{
       RULE: (value, formData) => {
@@ -27,12 +16,11 @@ const Simple = () => {
         };
       }
     }}
-    data={{ abc: [{ field1: '123zzz', field2: '22222', field3: '33333' }, { field2: '23232323' }], field: '' }}
+    //data={{ abc: [{ field1: '123zzz', field2: '22222', field3: '33333' }, { field2: '23232323' }], field: '' }}
     onError={error => {
-      console.log(error[0].fieldRef.current);
+      console.log(error[0]);
     }}
     onSubmit={(data, args) => {
-      console.log(args);
       return new Promise(resolve => {
         setTimeout(() => {
           console.log(JSON.stringify(data));
@@ -40,8 +28,7 @@ const Simple = () => {
         }, 1000);
       });
     }}>
-    <EventTest/>
-    <Input name="field" label="字段" rule="REQ LEN-0-10 RULE" value="11111"/>
+    <Input name="field" label="字段" rule="REQ LEN-0-10 RULE"/>
     <div>
       <button
         onClick={() => {

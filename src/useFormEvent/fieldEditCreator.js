@@ -4,17 +4,17 @@ import _get from 'lodash/get';
 
 const fieldEditCreator =
   ({ formStateRef, setFormState, initDataRef, otherProps }) =>
-  ({ id, name, rule, label, interceptor, value, noTrim, groupName, groupIndex, fieldRef }) => {
-    const field = formStateRef.current[id].clone();
-    field.setInfo({ groupName, groupIndex, label, rule, interceptor, noTrim, fieldRef });
-    if (field.value === void 0) {
-      field.setValue(
-        runInterceptors(
-          otherProps.current.interceptors,
-          'input',
-          interceptor
-        )(
-          value ||
+    ({ id, name, rule, label, interceptor, value, noTrim, groupName, groupIndex, fieldRef, errMsg }) => {
+      const field = formStateRef.current[id].clone();
+      field.setInfo({ groupName, groupIndex, label, rule, interceptor, noTrim, fieldRef, errMsg });
+      if (field.value === void 0) {
+        field.setValue(
+          runInterceptors(
+            otherProps.current.interceptors,
+            'input',
+            interceptor
+          )(
+            value ||
             (() => {
               if (groupName && _last(groupName.split('.')) === name) {
                 return _get(initDataRef.current, `${groupName}["${groupIndex}"]`);
@@ -24,11 +24,11 @@ const fieldEditCreator =
               }
               return _get(initDataRef.current, name);
             })()
-        )
-      );
-    }
+          )
+        );
+      }
 
-    setFormState(Object.assign({}, formStateRef.current, { [id]: field }));
-  };
+      setFormState(Object.assign({}, formStateRef.current, { [id]: field }));
+    };
 
 export default fieldEditCreator;

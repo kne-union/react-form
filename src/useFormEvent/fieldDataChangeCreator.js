@@ -1,8 +1,8 @@
 const fieldDataChangeCreator = ({ formStateRef, setFormState }) => {
-  const setFieldInfo = field => {
-    setFormState(Object.assign({}, formStateRef.current, { [field.id]: field }));
-  };
   return ({ id, value }) => {
+    if (!formStateRef.current[id]) {
+      return;
+    }
     const field = formStateRef.current[id].clone();
     field.setValue(value);
     field.setValidateStatus({ status: 0 });
