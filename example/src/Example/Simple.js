@@ -32,7 +32,7 @@ const Simple = () => {
     <div>
       <button
         onClick={() => {
-          groupListRef2.current.onAdd({isInsert:true});
+          groupListRef2.current.onAdd({isUnshift:true});
         }}>
         添加
       </button>
