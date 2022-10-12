@@ -32,7 +32,7 @@ const Simple = () => {
     <div>
       <button
         onClick={() => {
-          groupListRef2.current.onAdd();
+          groupListRef2.current.onAdd({isInsert:true});
         }}>
         添加
       </button>

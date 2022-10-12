@@ -44,15 +44,16 @@ const GroupList = forwardRef(({ name, empty, children }, ref) => {
     };
   }, [emitter, groupName, name]);
 
-  const onAdd = useCallback(() => {
+  const onAdd = useCallback((options) => {
+    const { isUnshift } = Object.assign({}, options);
     const parentId = groupInfoRef.current.id;
     setList(list => {
       if (list.length === 0) {
         return [`${parentId}-0`];
       }
       const newList = list.slice(0);
-      const index = last(last(list).split('-')) + 1;
-      newList.push(parentId ? `${parentId}-${index}` : index);
+      const index = parseInt(last((isUnshift ? list[0] : last(list)).split('-'))) + 1;
+      newList[isUnshift ? 'unshift' : 'push'](parentId ? `${parentId}-${index}` : index);
       return newList;
     });
   }, []);
