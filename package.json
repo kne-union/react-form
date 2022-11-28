@@ -1,6 +1,6 @@
 {
   "name": "@kne/react-form",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "description": "用于表单验证的react组件",
   "author": "linzp",
   "license": "MIT",
@@ -27,14 +27,14 @@
     "deploy": "gh-pages -d example/build"
   },
   "peerDependencies": {
-    "prop-types": "15.x",
-    "react": "16.x",
-    "react-dom": "16.x"
+    "prop-types": ">=15.x",
+    "react": ">=16.x",
+    "react-dom": ">=16.x"
   },
   "dependencies": {
     "@babel/runtime": "^7.7.7",
     "@kne/compose": "^0.1.0",
-    "@kne/use-event": "^0.1.0",
+    "@kne/use-event": "^0.1.2",
     "lodash": "^4.17.20",
     "use-debounce": "^5.1.0"
   },

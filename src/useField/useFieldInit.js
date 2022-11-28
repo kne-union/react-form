@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useFormContext } from '../context';
 
-const useFieldInit = ({ name, rule, label, interceptor, noTrim, value, id, groupName, groupIndex }) => {
+const useFieldInit = ({ name, rule, label, interceptor, noTrim, value, id, groupName, groupIndex, errMsg }) => {
   const fieldRef = useRef(null);
   const { formIsMount, emitter } = useFormContext();
   useEffect(() => {
@@ -17,19 +17,10 @@ const useFieldInit = ({ name, rule, label, interceptor, noTrim, value, id, group
   useEffect(() => {
     if (formIsMount && groupIndex !== -1) {
       emitter.emit('form-field-edit', {
-        name,
-        rule,
-        label,
-        interceptor,
-        noTrim,
-        id,
-        groupName,
-        groupIndex,
-        value,
-        fieldRef
+        name, rule, label, interceptor, noTrim, id, groupName, groupIndex, value, fieldRef, errMsg
       });
     }
-  }, [formIsMount, emitter, name, rule, label, interceptor, noTrim, id, groupName, groupIndex, value, fieldRef]);
+  }, [formIsMount, emitter, name, rule, label, interceptor, noTrim, id, groupName, groupIndex, value, fieldRef, errMsg]);
   return fieldRef;
 };
 

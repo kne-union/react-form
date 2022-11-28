@@ -22,7 +22,7 @@ class Field {
     this.isPass = false;
   }
 
-  setInfo({ groupName, groupIndex, label, rule, interceptor, noTrim, fieldRef }) {
+  setInfo({ groupName, groupIndex, label, rule, interceptor, noTrim, fieldRef, errMsg }) {
     this.groupName = groupName;
     this.groupIndex = groupIndex;
     this.label = label;
@@ -30,6 +30,7 @@ class Field {
     this.interceptor = interceptor;
     this.noTrim = noTrim;
     this.fieldRef = fieldRef;
+    this.errMsg = errMsg;
     return this;
   }
 
@@ -49,8 +50,7 @@ class Field {
 
   setValidateStatus({ status, msg = '' }) {
     this.validate = {
-      status,
-      msg
+      status, msg
     };
     return this;
   }
@@ -58,17 +58,12 @@ class Field {
   async runValidate(rules, getFormData) {
     const validate = await ruleValidate({
       field: {
-        name: this.name,
-        rule: this.rule
-      },
-      value: this.value,
-      formRules: rules,
-      getFormData
+        name: this.name, rule: this.rule
+      }, value: this.value, formRules: rules, getFormData
     });
     this.isPass = validate.result;
     this.validate = {
-      status: validate.result === true ? 1 : 2,
-      msg: validate.errMsg
+      status: validate.result === true ? 1 : 2, msg: validate.errMsg
     };
     return this;
   }

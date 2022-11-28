@@ -10,6 +10,8 @@ import dataSetCreator from './dataSetCreator';
 import dataResetCreator from './dataResetCreator';
 import dataSetFieldCreator from './dataSetFieldCreator';
 import submitCreator from './submitCreator';
+import dataSetFieldValidateCreator from './dataSetFieldValidateCreator';
+import validateAllFieldsCreator from './validateAllFieldsCreator';
 
 const usePropsRef = props => {
   const propsRef = useRef({});
@@ -19,7 +21,9 @@ const usePropsRef = props => {
   return propsRef;
 };
 
-const useFormEvent = ({ debug, formStateRef, formData, formDataRef, isPassRef, initDataRef, ...props }) => {
+const useFormEvent = ({
+                        debug, formStateRef, formData, formDataRef, computedIsPassRef, initDataRef, ...props
+                      }) => {
   const emitter = useEvent({ debug, name: 'react-form' });
   const emitterRef = useRef(emitter);
   emitterRef.current = emitter;
@@ -34,42 +38,24 @@ const useFormEvent = ({ debug, formStateRef, formData, formDataRef, isPassRef, i
     emitter.addListener('form-field-add', fieldAddCreator({ formStateRef, setFormState }));
     emitter.addListener('form-field-edit', fieldEditCreator({ formStateRef, setFormState, initDataRef, otherProps }));
     emitter.addListener('form-field-remove', fieldRemoveCreator({ formStateRef, setFormState }));
-    emitter.addListener(
-      'form-field-validate',
-      fieldValidateCreator({
-        formStateRef,
-        formDataRef,
-        setFormState,
-        otherProps,
-        taskQueue,
-        emitter
-      })
-    );
+    emitter.addListener('form-field-validate', fieldValidateCreator({
+      formStateRef, formDataRef, setFormState, otherProps, taskQueue, emitter
+    }));
     emitter.addListener('form-field-data-change', fieldDataChangeCreator({ formStateRef, setFormState }));
-    emitter.addListener(
-      'form-data-set',
-      dataSetCreator({
-        setFormState,
-        formStateRef,
-        initDataRef,
-        otherProps,
-        taskQueue,
-        emitter
-      })
-    );
+    emitter.addListener('form-data-set', dataSetCreator({
+      setFormState, formStateRef, initDataRef, otherProps, taskQueue, emitter
+    }));
     emitter.addListener('form-data-reset', dataResetCreator({ initDataRef, setFormState, formStateRef }));
-    emitter.addListener('form-data-set-field', dataSetFieldCreator({ setFormState, formStateRef, otherProps }));
-    emitter.addListener(
-      'form-submit',
-      submitCreator({
-        formStateRef,
-        formDataRef,
-        isPassRef,
-        taskQueue,
-        otherProps,
-        emitter
-      })
-    );
+    emitter.addListener('form-data-set-field', dataSetFieldCreator({
+      setFormState, formStateRef, formDataRef, taskQueue, emitter, otherProps
+    }));
+    emitter.addListener('form-data-set-field-validate', dataSetFieldValidateCreator({
+      setFormState, formStateRef, emitter
+    }));
+    emitter.addListener('form-validate-all', validateAllFieldsCreator({ formStateRef, taskQueue, emitter }));
+    emitter.addListener('form-submit', submitCreator({
+      formStateRef, formDataRef, taskQueue, otherProps, emitter
+    }));
     return () => {
       emitter.removeAllListeners();
     };

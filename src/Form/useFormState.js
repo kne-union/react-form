@@ -1,12 +1,12 @@
 import { useState, useRef, useMemo } from 'react';
 import set from 'lodash/set';
 import { runInterceptors } from '../interceptors';
+import stateToIsPass from '../common/stateToIsPass';
 import _last from 'lodash/last';
-import { filterEmpty } from '../empty';
 
 const useFormState = props => {
   const [state, setState] = useState({});
-  const formStateRef = useRef([]);
+  const formStateRef = useRef({});
   formStateRef.current = state;
 
   const propsRef = useRef({});
@@ -15,20 +15,13 @@ const useFormState = props => {
   const fields = useMemo(() => {
     return Object.values(state).map(item => {
       return {
-        field: item.fieldRef,
-        label: item.label,
-        name: item.name,
-        rule: item.rule
+        field: item.fieldRef, label: item.label, name: item.name, rule: item.rule
       };
     });
   }, [state]);
   const isPass = useMemo(() => {
-    return Object.values(state).every(field => {
-      return field.isPass;
-    });
+    return stateToIsPass(state);
   }, [state]);
-  const isPassRef = useRef(isPass);
-  isPassRef.current = isPass;
   const formData = useMemo(() => {
     const output = {};
     Object.values(state).forEach(field => {
@@ -46,22 +39,12 @@ const useFormState = props => {
       }
       set(output, field.name, fieldValue);
     });
-    return props.noFilter ? output : filterEmpty(output);
-  }, [state, props.noFilter]);
+    return output;
+  }, [state]);
   const formDataRef = useRef({});
   formDataRef.current = formData;
   return {
-    fields,
-    isPass,
-    isPassRef,
-    formData,
-    formDataRef,
-    formState: state,
-    formStateRef: formStateRef,
-    setFormState: state => {
-      if (!state) {
-        debugger;
-      }
+    fields, isPass, formData, formDataRef, formState: state, formStateRef: formStateRef, setFormState: state => {
       formStateRef.current = state;
       setState(state);
     }

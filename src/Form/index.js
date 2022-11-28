@@ -7,7 +7,9 @@ import RULES from '../RULES';
 import { GroupRoot } from '../Group';
 
 const Form = forwardRef((props, ref) => {
-  const { formState, formStateRef, formData, fields, isPass, isPassRef, formDataRef, setFormState } = useFormState(props);
+  const {
+    formState, formStateRef, formData, fields, isPass, isPassRef, formDataRef, setFormState
+  } = useFormState(props);
   const initDataRef = useRef(props.data);
 
   const [formIsMount, setFormIsMount] = useState(false);
@@ -40,32 +42,19 @@ const Form = forwardRef((props, ref) => {
     };
   }, []);
 
-  const openApi = useOpenApi({ emitter, fields, formState, formData, isPass });
+  const openApi = useOpenApi({ emitter, fields, formState, setFormState, formData, isPass });
   useImperativeHandle(ref, () => openApi, [openApi]);
 
-  return (
-    <Provider
-      value={{
-        formState,
-        formData,
-        setFormState,
-        emitter,
-        fields,
-        isPass,
-        formIsMount,
-        initDataRef,
-        openApi
-      }}>
-      <GroupRoot>{props.children}</GroupRoot>
-    </Provider>
-  );
+  return (<Provider
+    value={{
+      formState, formData, setFormState, emitter, fields, isPass, formIsMount, initDataRef, openApi
+    }}>
+    <GroupRoot>{props.children}</GroupRoot>
+  </Provider>);
 });
 
 Form.defaultProps = {
-  data: {},
-  debug: false,
-  rules: {},
-  interceptors: {}
+  data: {}, debug: false, rules: {}, interceptors: {}
 };
 
 export default Form;

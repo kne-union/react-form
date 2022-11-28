@@ -1,34 +1,26 @@
 import validateAllFieldsCreator from './validateAllFieldsCreator';
+import { filterEmpty } from '../empty';
+import stateToError from '../common/stateToError';
+import stateToIsPass from '../common/stateToIsPass';
 
-const submitCreator = ({ formStateRef, formDataRef, isPassRef, taskQueue, otherProps, emitter }) => {
+const submitCreator = ({ formStateRef, formDataRef, taskQueue, otherProps, emitter }) => {
   const validateAllFields = validateAllFieldsCreator({ formStateRef, taskQueue, emitter });
   return args => {
     if (!Array.isArray(args)) {
       args = [args];
     }
-    const { onPrevSubmit, onError, onSubmit } = otherProps.current;
+    const { onPrevSubmit, onError, onComplete, onSubmit, noFilter } = otherProps.current;
     validateAllFields()
       .then(async () => {
         const formState = formStateRef.current;
-        const isPass = isPassRef.current;
+        const isPass = stateToIsPass(formState);
         if (!isPass) {
-          const errors = Object.values(formState)
-            .filter(field => {
-              return field.validate.status === 2;
-            })
-            .map(field =>
-              Object.assign({}, field.validate, {
-                name: field.name,
-                groupName: field.groupName,
-                fieldRef: field.fieldRef,
-                groupIndex: field.groupIndex
-              })
-            );
+          const errors = stateToError(formState);
           emitter.emit('form-submit-error', errors);
           onError && (await onError(errors, ...args));
           return false;
         }
-        const formData = formDataRef.current;
+        const formData = noFilter === true ? formDataRef.current : filterEmpty(formDataRef.current);
         emitter.emit('form-prev-submit');
         if (onPrevSubmit && (await onPrevSubmit(formData, ...args)) === false) {
           emitter.emit('form-prev-submit-error');
@@ -38,17 +30,20 @@ const submitCreator = ({ formStateRef, formDataRef, isPassRef, taskQueue, otherP
         emitter.emit('form-submit-success', formData);
         return true;
       })
-      .then(
-        res => {
-          emitter.emit('form-submit-end', res);
-        },
-        e => {
-          console.error(e);
-          emitter.emit('form-error', e);
-        }
-      )
+      .then(res => {
+        emitter.emit('form-submit-end', res);
+      }, e => {
+        console.error(e);
+        emitter.emit('form-error', e);
+        return onError && (onError(e, ...args));
+      })
       .then(() => {
-        emitter.emit('form-submit-complete');
+        const formState = formStateRef.current;
+        const isPass = stateToIsPass(formState);
+        const formData = noFilter === true ? formDataRef.current : filterEmpty(formDataRef.current);
+        const errors = stateToError(formState);
+        emitter.emit('form-submit-complete', { formData, isPass, errors });
+        return onComplete && onComplete({ formData, isPass, errors });
       });
   };
 };

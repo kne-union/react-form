@@ -3,9 +3,9 @@ import { useDebouncedCallback } from 'use-debounce';
 import { useFormContext } from '../context';
 
 const useValidate = ({ name, id, time }) => {
-  const { emitter } = useFormContext();
+  const { formIsMount, emitter } = useFormContext();
   const checkValidate = () => {
-    emitter.emit('form-field-validate', { name, id });
+    formIsMount && emitter.emit('form-field-validate', { name, id });
   };
   const { callback: debouncedCheckValidate, cancel } = useDebouncedCallback(checkValidate, time);
   useEffect(() => {
