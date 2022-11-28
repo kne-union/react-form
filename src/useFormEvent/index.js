@@ -11,6 +11,7 @@ import dataResetCreator from './dataResetCreator';
 import dataSetFieldCreator from './dataSetFieldCreator';
 import submitCreator from './submitCreator';
 import dataSetFieldValidateCreator from './dataSetFieldValidateCreator';
+import validateAllFieldsCreator from './validateAllFieldsCreator';
 
 const usePropsRef = props => {
   const propsRef = useRef({});
@@ -45,12 +46,15 @@ const useFormEvent = ({
       setFormState, formStateRef, initDataRef, otherProps, taskQueue, emitter
     }));
     emitter.addListener('form-data-reset', dataResetCreator({ initDataRef, setFormState, formStateRef }));
-    emitter.addListener('form-data-set-field', dataSetFieldCreator({ setFormState, formStateRef, otherProps }));
+    emitter.addListener('form-data-set-field', dataSetFieldCreator({
+      setFormState, formStateRef, formDataRef, taskQueue, emitter, otherProps
+    }));
     emitter.addListener('form-data-set-field-validate', dataSetFieldValidateCreator({
       setFormState, formStateRef, emitter
     }));
+    emitter.addListener('form-validate-all', validateAllFieldsCreator({ formStateRef, taskQueue, emitter }));
     emitter.addListener('form-submit', submitCreator({
-      formStateRef, formDataRef, computedIsPassRef, taskQueue, otherProps, emitter
+      formStateRef, formDataRef, taskQueue, otherProps, emitter
     }));
     return () => {
       emitter.removeAllListeners();

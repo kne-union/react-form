@@ -6,12 +6,18 @@ import Group from './index';
 import { useGroupContext } from './context';
 import get from 'lodash/get';
 import last from 'lodash/last';
+import range from 'lodash/range';
 
 const context = createContext({});
 
 const { Provider } = context;
 
-const GroupList = forwardRef(({ name, empty, children }, ref) => {
+const GroupItem = ({ children }) => {
+  const { index } = useGroupContext();
+  return children({ index });
+};
+
+const GroupList = forwardRef(({ name, defaultLength, empty, children }, ref) => {
   const [list, setList] = useState([]);
   const { initDataRef, emitter } = useFormContext();
   const groupInfo = useGroupContext() || {};
@@ -26,17 +32,27 @@ const GroupList = forwardRef(({ name, empty, children }, ref) => {
   groupInfoRef.current = groupInfo;
   const dataRouter = useRef();
   dataRouter.current = groupName ? `${groupName}.${name}` : name;
+  const defaultLengthRef = useRef(defaultLength);
   useEffect(() => {
-    setList(() => {
+    const setValueCallback = (value) => {
       const parentId = groupInfoRef.current.id;
+      const mapCallback = (value, index) => parentId ? `${parentId}-${index}` : index;
+      if (Number.isInteger(defaultLengthRef.current) && defaultLengthRef.current > 0 && !(Array.isArray(value) && value.length >= defaultLengthRef.current)) {
+        return range(0, defaultLengthRef.current).map(mapCallback);
+      }
+      if (Array.isArray(value)) {
+        return value.map(mapCallback);
+      }
+      return [];
+    };
+    setList(() => {
       const value = get(initDataRef.current, groupName ? `${groupName}.${name}` : name);
-      return (Array.isArray(value) ? value : []).map((value, index) => parentId ? `${parentId}-${index}` : index);
+      return setValueCallback(value);
     });
     const sub = emitter.addListener('form-data-set', ({ data }) => {
-      const parentId = groupInfoRef.current.id;
       setList(() => {
         const value = get(data, groupName ? `${groupName}.${name}` : name);
-        return (Array.isArray(value) ? value : []).map((value, index) => parentId ? `${parentId}-${index}` : index);
+        return setValueCallback(value);
       });
     });
     return () => {
@@ -52,7 +68,7 @@ const GroupList = forwardRef(({ name, empty, children }, ref) => {
         return [`${parentId}-0`];
       }
       const newList = list.slice(0);
-      const index = parseInt(last((isUnshift ? list[0] : last(list)).split('-'))) + 1;
+      const index = Math.max(parseInt(last(list[0].split('-'))), parseInt(last(last(list).split('-')))) + 1;
       newList[isUnshift ? 'unshift' : 'push'](parentId ? `${parentId}-${index}` : index);
       return newList;
     });
@@ -80,8 +96,10 @@ const GroupList = forwardRef(({ name, empty, children }, ref) => {
     value={{
       onAdd, onRemove
     }}>
-    {list.length === 0 ? empty : list.map((key, index) => (<Group key={key} name={name}>
-      {children(key, { index, onAdd, onRemove: () => onRemove(key) })}
+    {list.length === 0 ? empty : list.map((key) => (<Group key={key} name={name}>
+      <GroupItem>{({ index }) => children(key, {
+        index, length: list.length, onAdd, onRemove: () => onRemove(key)
+      })}</GroupItem>
     </Group>))}
   </Provider>;
 });

@@ -28,17 +28,19 @@ const Simple = () => {
         }, 1000);
       });
     }}>
-    <Input name="field" label="字段" rule="REQ LEN-0-10 RULE"/>
+    <Input name='field' label='字段' rule='REQ LEN-0-10 RULE' />
     <div>
       <button
         onClick={() => {
-          groupListRef2.current.onAdd({isUnshift:true});
+          groupListRef2.current.onAdd({ isUnshift: true });
         }}>
         添加
       </button>
-      <GroupList ref={groupListRef2} name="group2">
-        {(key, { onRemove }) => (<div>
-          <Input name="group2" label="字段"/>
+      <GroupList ref={groupListRef2} name='group2' minLength={10}>
+        {(key, { index, onRemove }) => (<div>
+          {index}
+          <Input name='group2-1' label='字段' />
+          <Input name='group2-2' label='字段2' />
           <button onClick={() => onRemove(key)}>删除</button>
         </div>)}
       </GroupList>
@@ -50,11 +52,11 @@ const Simple = () => {
         }}>
         添加
       </button>
-      <GroupList ref={groupListRef} name="abc">
+      <GroupList ref={groupListRef} name='abc'>
         {(key, { onRemove }) => (<div>
-          <Input name="field" label="字段"/>
-          <Input name="field2" label="字段2"/>
-          <Input name="field3" label="字段3"/>
+          <Input name='field' label='字段' />
+          <Input name='field2' label='字段2' />
+          <Input name='field3' label='字段3' />
           <button onClick={() => onRemove(key)}>删除</button>
         </div>)}
       </GroupList>

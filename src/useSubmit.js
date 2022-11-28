@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useFormContext } from './context';
 
-const useSubmit = () => {
+const useSubmit = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const { isPass, emitter } = useFormContext();
+  const { onClick } = Object.assign({}, props);
   useEffect(() => {
     const target = emitter.addListener('form-submit-complete', () => {
       setIsLoading(false);
@@ -13,17 +14,16 @@ const useSubmit = () => {
     };
   }, [emitter]);
   return {
-    isLoading,
-    isPass,
-    onClick: useCallback(
-      (...args) => {
-        setIsLoading(true);
-        setTimeout(()=>{
-          emitter.emit('form-submit', args);
-        },0);
-      },
-      [emitter, setIsLoading]
-    )
+    isLoading, isPass, onClick: useCallback((...args) => {
+      setIsLoading(true);
+      setTimeout(() => {
+        Promise.resolve(onClick && onClick(...args)).then((returnArgs) => {
+          emitter.emit('form-submit', returnArgs || args);
+        }, () => {
+          setIsLoading(false);
+        });
+      }, 0);
+    }, [emitter, setIsLoading])
   };
 };
 

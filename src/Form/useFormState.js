@@ -1,11 +1,12 @@
 import { useState, useRef, useMemo } from 'react';
 import set from 'lodash/set';
 import { runInterceptors } from '../interceptors';
+import stateToIsPass from '../common/stateToIsPass';
 import _last from 'lodash/last';
 
 const useFormState = props => {
   const [state, setState] = useState({});
-  const formStateRef = useRef([]);
+  const formStateRef = useRef({});
   formStateRef.current = state;
 
   const propsRef = useRef({});
@@ -18,13 +19,8 @@ const useFormState = props => {
       };
     });
   }, [state]);
-  const computedIsPassRef = useRef((state) => {
-    return Object.values(state).every(field => {
-      return field.isPass;
-    });
-  });
   const isPass = useMemo(() => {
-    return computedIsPassRef.current(state);
+    return stateToIsPass(state);
   }, [state]);
   const formData = useMemo(() => {
     const output = {};
@@ -48,14 +44,7 @@ const useFormState = props => {
   const formDataRef = useRef({});
   formDataRef.current = formData;
   return {
-    fields,
-    isPass,
-    computedIsPassRef,
-    formData,
-    formDataRef,
-    formState: state,
-    formStateRef: formStateRef,
-    setFormState: state => {
+    fields, isPass, formData, formDataRef, formState: state, formStateRef: formStateRef, setFormState: state => {
       formStateRef.current = state;
       setState(state);
     }

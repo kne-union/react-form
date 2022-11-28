@@ -8,7 +8,7 @@ import { GroupRoot } from '../Group';
 
 const Form = forwardRef((props, ref) => {
   const {
-    formState, formStateRef, formData, fields, isPass, isPassRef, computedIsPassRef, formDataRef, setFormState
+    formState, formStateRef, formData, fields, isPass, isPassRef, formDataRef, setFormState
   } = useFormState(props);
   const initDataRef = useRef(props.data);
 
@@ -26,7 +26,6 @@ const Form = forwardRef((props, ref) => {
     formStateRef,
     formData,
     isPassRef,
-    computedIsPassRef,
     formDataRef,
     setFormState,
     initDataRef

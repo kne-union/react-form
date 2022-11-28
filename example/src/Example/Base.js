@@ -4,15 +4,15 @@ export const Input = props => {
   const fieldProps = useField(props);
   return (<>
     {fieldProps.label}
-    <input ref={fieldProps.fieldRef} type="text" value={fieldProps.value || ''} onChange={fieldProps.onChange}
-           onBlur={fieldProps.triggerValidate}/>
+    <input ref={fieldProps.fieldRef} type='text' value={fieldProps.value || ''} onChange={fieldProps.onChange}
+           onBlur={fieldProps.triggerValidate} />
     {fieldProps.errState}
     {fieldProps.errMsg}
   </>);
 };
 
-export const SubmitButton = ({ children }) => {
-  const { isLoading, onClick } = useSubmit();
+export const SubmitButton = ({ children, ...props }) => {
+  const { isLoading, onClick } = useSubmit(props);
   return (<button onClick={onClick}>
     {children}
     {isLoading ? '正在提交中...' : ''}

@@ -7,7 +7,7 @@ import GroupList2 from './Example/GroupList2'
 import SetFieldData from './Example/SetFieldData'
 
 const App = () => {
-  return <Simple />;
+  return <Simple2 />;
 };
 
 export default App;
