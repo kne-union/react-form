@@ -29,17 +29,8 @@ const useOpenApi = ({ emitter, fields, formState, formData, isPass }) => {
         emitter.addListener('form-unmount', () => {
           callback && callback();
         });
-      }, validateField(name, groupName) {
-        const field = formState[name];
-        const index = Object.getOwnPropertySymbols(field.data).find(index => {
-          const item = field.data[index];
-          return !groupName || groupName === item.groupName;
-        });
-        if (!index) {
-          console.error(`group[${groupName}]中没有找到字段[${name}]`);
-          return;
-        }
-        emitter.emit('form-field-validate', { name, index });
+      }, validateField({ name, groupName, groupIndex }) {
+        emitter.emit('form-field-validate', { name, groupName, groupIndex });
       }, validateAll() {
         return new Promise((resolve) => {
           emitter.emit('form-validate-all', {
