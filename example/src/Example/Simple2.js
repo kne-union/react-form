@@ -10,10 +10,17 @@ const TestButton = () => {
 };
 
 const Simple2 = () => {
-  return <Form debug onSubmit={(data, name) => {
+  return <Form debug rules={{
+    TEST: (value, data) => {
+      console.log(data);
+      return {
+        result: true
+      };
+    }
+  }} onSubmit={(data, name) => {
     console.log(data, name);
   }}>
-    <Input name='name' label='名称' rule='REQ' />
+    <Input name="name" label="名称" rule="REQ TEST"/>
     <SubmitButton onClick={() => {
       return new Promise((resolve) => {
         setTimeout(() => {
@@ -21,7 +28,7 @@ const Simple2 = () => {
         }, 1000);
       });
     }}>提交</SubmitButton>
-    <TestButton />
+    <TestButton/>
   </Form>;
 };
 

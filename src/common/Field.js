@@ -57,9 +57,7 @@ class Field {
 
   async runValidate(rules, getFormData) {
     const validate = await ruleValidate({
-      field: {
-        name: this.name, rule: this.rule
-      }, value: this.value, formRules: rules, getFormData
+      field: this.clone(), value: this.value, formRules: rules, getFormData
     });
     this.isPass = validate.result;
     this.validate = {

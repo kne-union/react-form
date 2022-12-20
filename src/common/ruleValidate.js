@@ -4,8 +4,7 @@ const ruleValidate = async ({ field, value, formRules, getFormData }) => {
   }
   if (typeof field.rule === 'object' && field.rule instanceof RegExp) {
     return {
-      result: field.rule.test(value),
-      errMsg: ''
+      result: field.rule.test(value), errMsg: ''
     };
   }
   if (typeof field.rule === 'string') {
@@ -16,20 +15,18 @@ const ruleValidate = async ({ field, value, formRules, getFormData }) => {
       if (typeof exec === 'function') {
         //空值处理 如果不为REQ规则的规则REQ判断不通过返回正确
         if (currentRule !== 'REQ') {
-          const emptyRes = formRules['REQ'](value, ...args, getFormData());
+          const emptyRes = formRules['REQ'](value, ...args, Object.assign({}, { data: getFormData() }, { field }));
           if (emptyRes.result !== true) {
             return {
-              result: true,
-              errMsg: ''
+              result: true, errMsg: ''
             };
           }
         }
 
-        const res = await exec(value, ...args, getFormData());
+        const res = await exec(value, ...args, Object.assign({}, { data: getFormData() }, { field }));
         if (res.result !== true) {
           return {
-            result: false,
-            errMsg: res.errMsg
+            result: false, errMsg: res.errMsg
           };
         }
       } else {
@@ -38,8 +35,7 @@ const ruleValidate = async ({ field, value, formRules, getFormData }) => {
     }
   }
   return {
-    result: true,
-    errMsg: ''
+    result: true, errMsg: ''
   };
 };
 
