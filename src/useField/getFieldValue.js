@@ -1,7 +1,7 @@
 import _get from 'lodash/get';
 
 const isEvent = event => {
-  return event instanceof window.Event || _get(event, 'nativeEvent') instanceof window.Event || typeof _get(event, 'preventDefault') === 'function';
+  return window.Event && (event instanceof window.Event || _get(event, 'nativeEvent') instanceof window.Event || typeof _get(event, 'preventDefault') === 'function');
 };
 
 const getFieldValue = (event, value) => {
