@@ -48,9 +48,9 @@ class Field {
     return clone(this);
   }
 
-  setValidateStatus({ status, msg = '' }) {
+  setValidateStatus({ status, msg = '', data }) {
     this.validate = {
-      status, msg
+      status, msg, data
     };
     return this;
   }
@@ -61,7 +61,7 @@ class Field {
     });
     this.isPass = validate.result;
     this.validate = {
-      status: validate.result === true ? 1 : 2, msg: validate.errMsg
+      status: validate.result === true ? 1 : 2, msg: validate.errMsg, validateData: Object.assign({}, validate.data)
     };
     return this;
   }
