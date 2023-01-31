@@ -1,8 +1,10 @@
+import getField from '../common/getField';
+
 const dataSetFieldCreator = ({ setFormState, formStateRef, emitter }) => ({
                                                                             name, groupName, groupIndex, validate
                                                                           }) => {
   const data = Object.assign({}, formStateRef.current);
-  const field = groupName ? Object.values(data).find(field => field.name === name && field.groupName === groupName && field.groupIndex === groupIndex) : Object.values(data).find(field => field.name === name);
+  const field = getField(data, { name, groupName, groupIndex });
   if (!field) {
     console.error('未找到要求字段');
     return;
