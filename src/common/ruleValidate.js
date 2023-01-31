@@ -7,6 +7,9 @@ const ruleValidate = async ({ field, value, formRules, getFormData }) => {
       result: field.rule.test(value), errMsg: ''
     };
   }
+
+  const data = {};
+
   if (typeof field.rule === 'string') {
     const rules = field.rule.split(' ').filter(str => str.length > 0);
     for (let currentRule of rules) {
@@ -18,15 +21,18 @@ const ruleValidate = async ({ field, value, formRules, getFormData }) => {
           const emptyRes = formRules['REQ'](value, ...args, Object.assign({}, { data: getFormData() }, { field }));
           if (emptyRes.result !== true) {
             return {
-              result: true, errMsg: ''
+              result: true, errMsg: '', data
             };
           }
         }
 
         const res = await exec(value, ...args, Object.assign({}, { data: getFormData() }, { field }));
+
+        Object.assign(data, res.data);
+
         if (res.result !== true) {
           return {
-            result: false, errMsg: res.errMsg
+            result: false, errMsg: res.errMsg, data
           };
         }
       } else {
@@ -35,7 +41,7 @@ const ruleValidate = async ({ field, value, formRules, getFormData }) => {
     }
   }
   return {
-    result: true, errMsg: ''
+    result: true, errMsg: '', data
   };
 };
 
