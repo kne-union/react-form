@@ -7,7 +7,7 @@ const useValidate = ({ name, id, time }) => {
   const checkValidate = () => {
     formIsMount && emitter.emit('form-field-validate', { name, id });
   };
-  const { callback: debouncedCheckValidate, cancel } = useDebouncedCallback(checkValidate, time);
+  const debouncedCheckValidate = useDebouncedCallback(checkValidate, time),cancel = debouncedCheckValidate.cancel;
   useEffect(() => {
     const subscription = emitter.addListener('form-data-reset', cancel);
     return () => {
