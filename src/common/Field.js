@@ -48,9 +48,9 @@ class Field {
     return clone(this);
   }
 
-  setValidateStatus({ status, msg = '', data }) {
+  setValidateStatus({ status, msg = '', validateData }) {
     this.validate = {
-      status, msg, data
+      status, msg, validateData: validateData || this.validate.validateData
     };
     return this;
   }
