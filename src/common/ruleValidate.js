@@ -28,7 +28,7 @@ const ruleValidate = async ({ field, value, formRules, getFormData }) => {
 
         const res = await exec(value, ...args, Object.assign({}, { data: getFormData() }, { field }));
 
-        Object.assign(data, res.data);
+        Object.assign(data, { [key.toUpperCase()]: res.data });
 
         if (res.result !== true) {
           return {
