@@ -51,7 +51,7 @@ class Field {
 
   setValidateStatus({ status, msg = '', validateData }) {
     this.validate = {
-      status, msg, validateData: validateData || this.validate.validateData
+      status, msg, validateData: Object.assign({}, this.validate.validateData, validateData)
     };
     return this;
   }
@@ -62,7 +62,9 @@ class Field {
     });
     this.isPass = validate.result;
     this.validate = {
-      status: validate.result === true ? 1 : 2, msg: validate.errMsg, validateData: Object.assign({}, validate.data)
+      status: validate.result === true ? 1 : 2,
+      msg: validate.errMsg,
+      validateData: Object.assign({}, this.validate.validateData, validate.data)
     };
     return this;
   }
