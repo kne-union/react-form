@@ -20,6 +20,7 @@ class Field {
     this.id = id;
     this.name = name;
     this.isPass = false;
+    this.validate = {};
   }
 
   setInfo({ groupName, groupIndex, label, rule, interceptor, noTrim, fieldRef, errMsg }) {
