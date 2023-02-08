@@ -1,6 +1,6 @@
 const ruleValidate = async ({ field, value, formRules, getFormData }) => {
   if (typeof field.rule === 'function') {
-    return await field.rule(value);
+    return await field.rule(value, Object.assign({}, { data: getFormData() }, { field }));
   }
   if (typeof field.rule === 'object' && field.rule instanceof RegExp) {
     return {
