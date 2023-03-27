@@ -5,6 +5,7 @@ import stateToError from './common/stateToError';
 import compileErrMsg from './common/compileErrMsg';
 
 export default Form;
+export { default as Form } from './Form';
 export { default as useField } from './useField';
 export { default as useReset } from './useReset';
 export { default as useSubmit } from './useSubmit';

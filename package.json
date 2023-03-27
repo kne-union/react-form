@@ -1,6 +1,6 @@
 {
   "name": "@kne/react-form",
-  "version": "2.1.8",
+  "version": "2.1.9",
   "description": "用于表单验证的react组件",
   "author": "linzp",
   "license": "MIT",
