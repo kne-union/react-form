@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { Provider, useGroupContext } from './context';
 import { useFormContext } from '../context';
-import uniqueId from 'lodash/uniqueId';
-import _get from 'lodash/get';
+import { uniqueId, get as _get } from 'lodash';
 import groupKey from './groupKey';
 
 const Group = ({ name, children }) => {

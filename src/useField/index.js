@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
 import { useGroup } from '../Group';
 import { useFormContext } from '../context';
-import uniqueId from 'lodash/uniqueId';
-import _get from 'lodash/get';
+import { uniqueId, get as _get } from 'lodash';
 import useFieldInit from './useFieldInit';
 import useValidate from './useValidate';
 import useFieldDataChange from './useFieldDataChange';

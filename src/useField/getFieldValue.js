@@ -1,4 +1,4 @@
-import _get from 'lodash/get';
+import {get as _get} from 'lodash';
 
 const isEvent = event => {
   return window.Event && (event instanceof window.Event || _get(event, 'nativeEvent') instanceof window.Event || typeof _get(event, 'preventDefault') === 'function');
