@@ -6,7 +6,7 @@
   "author": "linzp",
   "license": "MIT",
   "repository": "https://github.com/kne-union/react-form",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.modern.js",
   "source": "src/index.js",
   "engines": {
