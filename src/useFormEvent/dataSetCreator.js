@@ -1,5 +1,4 @@
-import _last from 'lodash/last';
-import _get from 'lodash/get';
+import { last as _last, get as _get } from 'lodash';
 import { runInterceptors } from '../interceptors';
 import validateAllFieldsCreator from './validateAllFieldsCreator';
 
@@ -10,9 +9,7 @@ const dataSetCreator = ({ setFormState, formStateRef, initDataRef, otherProps, t
     const output = {};
     Object.values(Object.assign({}, formStateRef.current)).forEach(field => {
       const newField = field.clone();
-      const groupName = newField.groupName,
-        targetIndex = newField.groupIndex,
-        name = newField.name;
+      const groupName = newField.groupName, targetIndex = newField.groupIndex, name = newField.name;
       const value = (() => {
         if (groupName && _last(groupName.split('.')) === name) {
           return _get(data, `${groupName}[${targetIndex}]`);

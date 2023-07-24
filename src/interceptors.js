@@ -1,23 +1,19 @@
 import compose from '@kne/compose';
-import _get from 'lodash/get';
-import _uniqBy from 'lodash/uniqBy';
+import { get as _get, uniqBy as _uniqBy } from 'lodash';
 
 const interceptors = {
-  input: [],
-  output: []
+  input: [], output: []
 };
 
 interceptors.input.use = (name, func) => {
   return interceptors.input.push({
-    name,
-    exec: func
+    name, exec: func
   });
 };
 
 interceptors.output.use = (name, func) => {
   return interceptors.output.push({
-    name,
-    exec: func
+    name, exec: func
   });
 };
 
@@ -30,13 +26,10 @@ export const runInterceptors = (interceptors, type, names) => {
     names = [names];
   }
 
-  const currentInterceptors = _uniqBy(
-    baseInterceptors[type]
-      .concat(_get(interceptors, type, []))
-      .filter(({ name }) => names.indexOf(name) > -1)
-      .reverse(),
-    ({ name }) => name
-  );
+  const currentInterceptors = _uniqBy(baseInterceptors[type]
+    .concat(_get(interceptors, type, []))
+    .filter(({ name }) => names.indexOf(name) > -1)
+    .reverse(), ({ name }) => name);
 
   if (currentInterceptors.length === 0) {
     return value => value;

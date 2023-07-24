@@ -1,6 +1,4 @@
-import isPlainObject from 'lodash/isPlainObject';
-import getValues from 'lodash/values';
-import isArray from 'lodash/isArray';
+import { isPlainObject, values as getValues, isArray } from 'lodash';
 
 export const isNotEmpty = value => {
   if (isPlainObject(value)) {

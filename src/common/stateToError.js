@@ -1,5 +1,5 @@
 import compileErrMsg from './compileErrMsg';
-import _get from 'lodash/get';
+import {get as _get} from 'lodash';
 
 const stateToError = (formState) => {
   return Object.values(formState)

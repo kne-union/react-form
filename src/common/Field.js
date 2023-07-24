@@ -12,7 +12,7 @@
  * - noTrim 是否去掉两端空格
  * - fieldRef 字段引用
  * */
-import clone from 'lodash/clone';
+import {clone} from 'lodash';
 import ruleValidate from './ruleValidate';
 
 class Field {

@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useState } from 'react';
-import uniqueId from 'lodash/uniqueId';
+import {uniqueId} from 'lodash';
 import { Provider, useGroupContext } from './context';
 import { useFormContext } from '../context';
 import groupKey from './groupKey';

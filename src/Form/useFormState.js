@@ -1,8 +1,7 @@
 import { useState, useRef, useMemo } from 'react';
-import set from 'lodash/set';
+import { set, last as _last } from 'lodash';
 import { runInterceptors } from '../interceptors';
 import stateToIsPass from '../common/stateToIsPass';
-import _last from 'lodash/last';
 
 const useFormState = props => {
   const [state, setState] = useState({});

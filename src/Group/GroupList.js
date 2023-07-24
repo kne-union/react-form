@@ -4,9 +4,7 @@ import React, {
 import { useFormContext } from '../context';
 import Group from './index';
 import { useGroupContext } from './context';
-import get from 'lodash/get';
-import last from 'lodash/last';
-import range from 'lodash/range';
+import { get, last, range } from 'lodash';
 
 const context = createContext({});
 
