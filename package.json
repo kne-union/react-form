@@ -1,12 +1,13 @@
 {
   "name": "@kne/react-form",
-  "version": "2.1.11",
+  "version": "2.1.12",
+  "type": "module",
   "description": "用于表单验证的react组件",
   "author": "linzp",
   "license": "MIT",
   "repository": "https://github.com/kne-union/react-form",
   "main": "dist/index.js",
-  "module": "dist/index.modern.mjs",
+  "module": "dist/index.modern.js",
   "source": "src/index.js",
   "engines": {
     "node": ">=10"
