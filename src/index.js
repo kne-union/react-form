@@ -3,6 +3,7 @@ import { isNotEmpty, isEmpty, filterEmpty } from './empty';
 import stateToIsPass from './common/stateToIsPass';
 import stateToError from './common/stateToError';
 import compileErrMsg from './common/compileErrMsg';
+import getField from './common/getField';
 
 export default Form;
 export { default as Form } from './Form';
@@ -17,7 +18,7 @@ export { default as interceptors } from './interceptors';
 
 // 命名不规范已经废弃
 export const util = {
-  isNotEmpty, isEmpty, filterEmpty, stateToIsPass, stateToError, compileErrMsg
+  isNotEmpty, isEmpty, filterEmpty, stateToIsPass, stateToError, compileErrMsg, getField
 };
 
 export const formUtils = util;
