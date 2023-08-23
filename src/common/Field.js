@@ -64,7 +64,7 @@ class Field {
     this.validate = {
       status: validate.result === true ? 1 : 2,
       msg: validate.errMsg,
-      validateData: Object.assign({}, this.validate.validateData, validate.data)
+      validateData: Object.assign({}, validate.data)
     };
     return this;
   }
