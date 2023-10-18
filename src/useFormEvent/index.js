@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import useEvent from '@kne/use-event';
 import fieldAddCreator from './fieldAddCreator';
 import fieldEditCreator from './fieldEditCreator';
@@ -47,7 +47,7 @@ const useFormEvent = ({
     }));
     emitter.addListener('form-data-reset', dataResetCreator({ initDataRef, setFormState, formStateRef }));
     emitter.addListener('form-data-set-field', dataSetFieldCreator({
-      setFormState, formStateRef, formDataRef, taskQueue, emitter, otherProps
+      setFormState, formStateRef, initDataRef, formDataRef, taskQueue, emitter, otherProps
     }));
     emitter.addListener('form-data-set-field-validate', dataSetFieldValidateCreator({
       setFormState, formStateRef, emitter
