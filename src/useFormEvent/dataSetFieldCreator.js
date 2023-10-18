@@ -20,14 +20,14 @@ const dataSetFieldCreator = ({
     const field = groupName ? Object.values(data).find(field => field.name === name && field.groupName === groupName && field.groupIndex === groupIndex) : Object.values(data).find(field => field.name === name);
     if (!field) {
       if (groupName && _last(groupName.split('.')) === name) {
-        _set(initDataRef.current, `${groupName}["${groupIndex}"]`)
+        _set(initDataRef.current, `${groupName}["${groupIndex}"]`, value);
         return;
       }
       if (groupName) {
-        _set(initDataRef.current, `${groupName}["${groupIndex}"].${name}`)
+        _set(initDataRef.current, `${groupName}["${groupIndex}"].${name}`, value);
         return;
       }
-      _set(initDataRef.current, name);
+      _set(initDataRef.current, name, value);
       return;
     }
     data[field.id] = field.clone().setValue(runInterceptors(otherProps.current.interceptors, 'input', field.interceptor)(value));
