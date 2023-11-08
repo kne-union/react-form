@@ -16,6 +16,7 @@ const dataSetFieldCreator = ({
     formStateRef, formDataRef, setFormState, otherProps, taskQueue, emitter
   });
   return ({ name, groupName, groupIndex, value, runValidate = true }) => {
+    console.warn('form-data-set-field事件已经废弃目前暂时兼容，后续版本可能会删除,请使用form-data-set-field-list事件代替');
     const data = Object.assign({}, formStateRef.current);
     const field = groupName ? Object.values(data).find(field => field.name === name && field.groupName === groupName && field.groupIndex === groupIndex) : Object.values(data).find(field => field.name === name);
     if (!field) {
