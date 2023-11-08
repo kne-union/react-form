@@ -32,7 +32,6 @@ const dataSetFieldListCreator = ({
         const groupFieldList = getGroupFieldList(data, { groupName, name });
         groupFieldList.forEach((field) => {
           data[field.id] = field.clone().setValue(runInterceptors(otherProps.current.interceptors, 'input', field.interceptor)(value));
-          console.log(validate);
           validate ? data[field.id].setValidateStatus(validate) : validateFieldIdList.push(field.id);
         });
         return;
