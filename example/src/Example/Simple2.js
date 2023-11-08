@@ -1,11 +1,12 @@
-import React, { useRef, useEffect } from 'react';
-import { Input, SubmitButton, ResetButton } from './Base';
+import React from 'react';
+import { Input, SubmitButton } from './Base';
 import Form, { useFormContext } from '@kne/react-form';
 
 const TestButton = () => {
   const { openApi } = useFormContext();
   return <button onClick={async () => {
-    console.log(await openApi.validateAll());
+    //console.log(await openApi.validateAll());
+    openApi.setField({ name: 'name', value: 'xxxxx' });
   }}>我是测试按钮</button>;
 };
 

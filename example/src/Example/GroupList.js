@@ -1,5 +1,5 @@
-import React, { useRef, useEffect } from 'react';
-import { Input, SubmitButton, ResetButton } from './Base';
+import React, { useRef } from 'react';
+import { Input, SubmitButton } from './Base';
 import Form, { GroupList, useFormContext } from '@kne/react-form';
 
 const FormInfo = () => {
@@ -10,9 +10,9 @@ const FormInfo = () => {
 
 const InputComputed = () => {
   const { formData } = useFormContext();
-  return <Input name="field3" label="字段3" onChange={() => {
+  return <Input name='field3' label='字段3' onChange={() => {
     console.log('>>>>>>', formData);
-  }}/>;
+  }} />;
 };
 
 const GroupInner = () => {
@@ -26,12 +26,12 @@ const GroupInner = () => {
         }}>
         添加
       </button>
-      <GroupList ref={groupListRef2} name="group2">
+      <GroupList ref={groupListRef2} name='group2'>
         {(key, { onRemove }) => (<div>
-          <Input name="field2" label="字段" onChange={() => {
+          <Input name='field2' label='字段' onChange={() => {
             console.log('222222', formData);
-          }}/>
-          <InputComputed/>
+          }} />
+          <InputComputed />
           <button onClick={() => onRemove(key)}>删除</button>
           <div>>>>>>>>>>>>>>>>>></div>
         </div>)}
@@ -42,7 +42,8 @@ const GroupInner = () => {
 
 const Simple2 = () => {
   const groupListRef1 = useRef(null);
-  return <Form data={{
+  const formRef = useRef(null);
+  return <Form ref={formRef} data={{
     'group': [{
       'field': '123', 'field3': 'field3', 'group2': [{
         'field2': '1111', 'field3': 'field3'
@@ -63,7 +64,7 @@ const Simple2 = () => {
   }} onSubmit={(data) => {
     console.log(data);
   }}>
-    <FormInfo/>
+    <FormInfo />
     <div>
       <button
         onClick={() => {
@@ -71,11 +72,20 @@ const Simple2 = () => {
         }}>
         添加
       </button>
-      <GroupList ref={groupListRef1} name="group">
+      <button onClick={() => {
+        formRef.current.setField({
+          groupName: 'group',
+          name: 'field',
+          value: 'xxxxxxx',
+          validate: { status: 2, msg: '设置的错误' }
+        });
+      }}>设置值
+      </button>
+      <GroupList ref={groupListRef1} name='group'>
         {(key, { onRemove }) => (<div>
-          <Input name="field" label="字段"/>
-          <Input name="field3" label="字段3"/>
-          <GroupInner/>
+          <Input name='field' label='字段' />
+          <Input name='field3' label='字段3' />
+          <GroupInner />
           <button onClick={() => onRemove(key)}>删除</button>
           <div>------------------------</div>
         </div>)}

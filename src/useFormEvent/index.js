@@ -9,6 +9,7 @@ import fieldDataChangeCreator from './fieldDataChangeCreator';
 import dataSetCreator from './dataSetCreator';
 import dataResetCreator from './dataResetCreator';
 import dataSetFieldCreator from './dataSetFieldCreator';
+import dataSetFieldListCreator from './dataSetFieldListCreator';
 import submitCreator from './submitCreator';
 import dataSetFieldValidateCreator from './dataSetFieldValidateCreator';
 import validateAllFieldsCreator from './validateAllFieldsCreator';
@@ -42,16 +43,25 @@ const useFormEvent = ({
       formStateRef, formDataRef, setFormState, otherProps, taskQueue, emitter
     }));
     emitter.addListener('form-field-data-change', fieldDataChangeCreator({ formStateRef, setFormState }));
+
     emitter.addListener('form-data-set', dataSetCreator({
       setFormState, formStateRef, initDataRef, otherProps, taskQueue, emitter
     }));
     emitter.addListener('form-data-reset', dataResetCreator({ initDataRef, setFormState, formStateRef }));
+
+    // 该事件已经废弃目前暂时兼容，后续版本可能会删除
     emitter.addListener('form-data-set-field', dataSetFieldCreator({
       setFormState, formStateRef, initDataRef, formDataRef, taskQueue, emitter, otherProps
     }));
+
+    emitter.addListener('form-data-set-field-list', dataSetFieldListCreator({
+      setFormState, formStateRef, initDataRef, formDataRef, taskQueue, emitter, otherProps
+    }));
+
     emitter.addListener('form-data-set-field-validate', dataSetFieldValidateCreator({
       setFormState, formStateRef, emitter
     }));
+
     emitter.addListener('form-validate-all', validateAllFieldsCreator({ formStateRef, taskQueue, emitter }));
     emitter.addListener('form-submit', submitCreator({
       formStateRef, formDataRef, taskQueue, otherProps, emitter
