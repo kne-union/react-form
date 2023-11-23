@@ -2,7 +2,7 @@ import getField from '../common/getField';
 
 const fieldValidateCreator = ({ formStateRef, formDataRef, setFormState, otherProps, taskQueue, emitter }) => {
   const setFieldInfo = field => {
-    setFormState(Object.assign({}, formStateRef.current, { [field.id]: field }));
+    field.fieldRef.current && setFormState(Object.assign({}, formStateRef.current, { [field.id]: field }));
   };
   return ({ id, name, groupName, groupIndex }) => {
     const field = getField(formStateRef.current, { id, name, groupName, groupIndex });
