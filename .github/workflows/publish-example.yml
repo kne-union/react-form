@@ -18,10 +18,23 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-      - run: npm i --legacy-peer-deps
-      - run: npm run build:lib
-      - run: npm publish
+
+      - name: Install 🔧
+        run: npm install --legacy-peer-deps
+
+      - name: Build 🏗️
+        run: npm run build
+
+      - name: Deploy to GH Pages 🚀
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./example/build
+
+      - name: Publish Npm
         env:
           NODE_AUTH_TOKEN: ${{secrets.KNE_PACKAGE_PUBLISH}}
-      - run: npm i -g cnpm
-      - run: cnpm sync @kne/react-form
+        run: cd example && npm publish --access=public
+      ## 请修改对应的packageName后取消以下命令的注释
+      - name: Sync To Cnpm
+        run: npm i -g cnpm && cnpm sync @kne-example/react-form
