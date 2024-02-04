@@ -50,7 +50,7 @@
   "devDependencies": {
     "@craco/craco": "^7.1.0",
     "@kne/microbundle": "^0.15.4",
-    "@kne/modules-dev": "^1.1.0",
+    "@kne/modules-dev": "^1.1.1",
     "cross-env": "^7.0.2",
     "husky": "^9.0.10",
     "lint-staged": "^15.2.1",
