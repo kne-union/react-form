@@ -20,7 +20,6 @@
     ]
   },
   "scripts": {
-    "init": "npm i --legacy-peer-deps && npm run init-example",
     "init-example": "modules-dev-libs-init",
     "start": "run-p start:lib start:example",
     "build": "run-s build:lib build:example",

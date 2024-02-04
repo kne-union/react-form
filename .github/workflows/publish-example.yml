@@ -5,7 +5,7 @@ name: Publish Example
 
 on:
   pull_request:
-    branches: [master]
+    branches: [ master ]
     types:
       - closed
 jobs:
@@ -20,10 +20,16 @@ jobs:
           registry-url: https://registry.npmjs.org/
 
       - name: Install 🔧
-        run: npm run init
+        run: npm i --legacy-peer-deps
 
-      - name: Build 🏗️
-        run: npm run build
+      - name: Build Lib 🏗️
+        run: npm run build:lib
+
+      - name: Init Example
+        run: npm run init-example
+
+      - name: Build example
+        run: npm run build:example
 
       - name: Deploy to GH Pages 🚀
         uses: peaceiris/actions-gh-pages@v3
