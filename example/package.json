@@ -1,30 +1,54 @@
 {
-  "name": "react-form-example",
-  "homepage": ".",
-  "version": "0.0.0",
-  "private": true,
-  "scripts": {
-    "start": "node ../node_modules/react-scripts/bin/react-scripts.js start",
-    "build": "node ../node_modules/react-scripts/bin/react-scripts.js build",
-    "test": "node ../node_modules/react-scripts/bin/react-scripts.js test",
-    "eject": "node ../node_modules/react-scripts/bin/react-scripts.js eject"
-  },
+  "name": "@kne-components/react-form",
+  "version": "2.1.23",
   "dependencies": {
+    "@kne/react-form": "file:..",
     "react": "file:../node_modules/react",
     "react-dom": "file:../node_modules/react-dom",
-    "react-scripts": "file:../node_modules/react-scripts",
-    "@kne/react-form": "file:.."
+    "react-scripts": "^5.0.0"
   },
-  "devDependencies": {
-    "@babel/plugin-syntax-object-rest-spread": "^7.8.3"
+  "scripts": {
+    "start": "cross-env PORT=3020 MODULES_DEV_PUBLIC_URL=/ craco start",
+    "build": "cross-env COMPONENTS_NAME=react-form MODULES_DEV_PUBLIC_URL=/react-form  craco build",
+    "test": "craco test --coverage",
+    "eject": "react-scripts eject",
+    "init": "npm i --legacy-peer-deps",
+    "create": "modules-dev-create"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@craco/craco": "^7.1.0",
+    "@kne/craco-module-federation": "^1.1.2",
+    "@kne/modules-dev": "^1.0.5",
+    "@kne/react-fetch": "^1.4.2",
+    "@kne/remote-loader": "^1.2.3",
+    "antd": "^5.13.3",
+    "axios": "^1.6.7",
+    "classnames": "^2.5.1",
+    "cross-env": "^7.0.3",
+    "http-proxy-middleware": "^2.0.6",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.3.0",
+    "lodash": "^4.17.21",
+    "node-sass": "^7.0.3",
+    "prettier": "^2.8.8",
+    "react-router-dom": "^6.22.0"
+  }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@kne/react-form",
-  "version": "2.1.22",
+  "version": "2.1.23",
   "syntax": {
     "esmodules": true
   },
@@ -14,8 +14,13 @@
   "engines": {
     "node": ">=10"
   },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx,json,css,scss}": [
+      "prettier --write"
+    ]
+  },
   "scripts": {
-    "init": "run-p npm install cd example && npm install",
+    "init": "npm install --legacy-peer-deps && cd example && npm install --legacy-peer-deps",
     "start": "run-p start:lib start:example",
     "build": "run-s build:lib build:example",
     "build:lib": "microbundle --no-compress --format modern,cjs --jsx React.createElement",
@@ -27,7 +32,8 @@
     "test:watch": "react-scripts test --env=jsdom",
     "build:example": "cd example && npm run build",
     "start:example": "cd example && npm run start",
-    "deploy": "gh-pages -d example/build"
+    "lint-staged": "lint-staged",
+    "prepare": "husky install"
   },
   "peerDependencies": {
     "prop-types": ">=15.x",
@@ -43,14 +49,13 @@
   },
   "devDependencies": {
     "@kne/microbundle": "^0.15.4",
-    "babel-eslint": "^10.0.3",
     "cross-env": "^7.0.2",
-    "gh-pages": "^2.2.0",
+    "husky": "^9.0.10",
+    "lint-staged": "^15.2.1",
     "npm-run-all": "^4.1.5",
-    "prettier": "^2.3.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-scripts": "^4.0.3"
+    "prettier": "^2.8.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "files": [
     "dist"

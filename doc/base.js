@@ -1,28 +1,37 @@
-import { useField, useSubmit, useReset } from '@kne/react-form';
+const { default: Form, useField, useSubmit, useReset } = reactForm;
 
-export const Input = props => {
+const Input = props => {
   const fieldProps = useField(props);
-  return (<>
+  return (<div>
     {fieldProps.label}
     <input ref={fieldProps.fieldRef} type='text' value={fieldProps.value || ''} onChange={fieldProps.onChange}
            onBlur={fieldProps.triggerValidate} />
     {fieldProps.errState}
     {fieldProps.errMsg}
-  </>);
+  </div>);
 };
 
-export const SubmitButton = ({ children, ...props }) => {
-  const { isLoading, onClick } = useSubmit(props);
+const SubmitButton = ({ children }) => {
+  const { isLoading, onClick } = useSubmit();
   return (<button onClick={onClick}>
     {children}
     {isLoading ? '正在提交中...' : ''}
   </button>);
 };
 
-export const ResetButton = () => {
+const ResetButton = () => {
   const { onClick } = useReset();
   return <button onClick={onClick}>重置</button>;
 };
 
+const Example = ()=>{
+  return <Form>
+    <Input name="name" label="名称" rule="REQ LEN-0-10"/>
+    <div>
+      <SubmitButton>提交</SubmitButton>
+      <ResetButton>重置</ResetButton>
+    </div>
+  </Form>
+};
 
-
+render(<Example />);

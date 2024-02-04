@@ -1,13 +1,28 @@
-import React from 'react';
-import Simple from './Example/Simple';
-import Simple2 from './Example/Simple2';
-import Large from './Example/Large';
-import GroupList from './Example/GroupList'
-import GroupList2 from './Example/GroupList2'
-import SetFieldData from './Example/SetFieldData'
+import { HashRouter } from "react-router-dom";
+import createEntry from "@kne/modules-dev/dist/create-entry";
+import "@kne/modules-dev/dist/create-entry.css";
+import readme from "readme";
 
-const App = () => {
-  return <GroupList />;
+const ExampleRoutes = createEntry.ExampleRoutes;
+
+const App = ({ preset, themeToken, ...props }) => {
+  return (
+      <HashRouter>
+        <ExampleRoutes
+            {...props}
+            paths={[
+              {
+                key: "components",
+                path: "/",
+                title: "首页",
+              },
+            ]}
+            preset={preset}
+            themeToken={themeToken}
+            readme={readme}
+        />
+      </HashRouter>
+  );
 };
 
 export default App;

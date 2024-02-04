@@ -1,5 +1,15 @@
-This example was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Getting Started with Create React App
 
-It is linked to the react-form package in the parent directory for development purposes.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-You can run `npm install` and then `npm start` to test your package.
+## Available Scripts
+
+In the project directory, you can run:
+
+### 1、 `npm run init`
+
+### 2、 `npm start`
+
+### 3、 `npm test`
+
+### 4、 `npm run build`
