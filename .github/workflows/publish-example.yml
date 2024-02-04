@@ -43,4 +43,4 @@ jobs:
         run: cd example && npm publish --access=public
       ## 请修改对应的packageName后取消以下命令的注释
       - name: Sync To Cnpm
-        run: npm i -g cnpm && cnpm sync @kne-example/react-form
+        run: npm i -g cnpm && cnpm sync @kne-components/react-form
