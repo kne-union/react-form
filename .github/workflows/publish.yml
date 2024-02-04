@@ -28,7 +28,7 @@ jobs:
       - name: Publish Npm
         env:
           NODE_AUTH_TOKEN: ${{secrets.KNE_PACKAGE_PUBLISH}}
-        run: cd example && npm publish --access=public
+        run: npm publish --access=public
       ## 请修改对应的packageName后取消以下命令的注释
       - name: Sync To Cnpm
         run: npm i -g cnpm && cnpm sync @kne/react-form
