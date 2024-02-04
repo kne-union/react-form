@@ -7,6 +7,9 @@
     "react-dom": "file:../node_modules/react-dom",
     "react-scripts": "^5.0.0"
   },
+  "files": [
+    "build"
+  ],
   "scripts": {
     "start": "cross-env PORT=3020 MODULES_DEV_PUBLIC_URL=/ craco start",
     "build": "cross-env COMPONENTS_NAME=react-form MODULES_DEV_PUBLIC_URL=/react-form  craco build",
