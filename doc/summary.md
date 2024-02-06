@@ -1,5 +1,3 @@
-用于表单验证
-
 #### 特点
 
 * UI分离，支持自定义UI框架。提供了antd的组件封装 @kne/react-form-antd 和 taro的组件封装 @kne/react-form-taro
