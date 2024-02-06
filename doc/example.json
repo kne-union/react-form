@@ -11,6 +11,17 @@
           "packageName": "@kne/react-form"
         }
       ]
+    },
+    {
+      "title": "展示了GroupList的使用",
+      "description": "这里填写示例说明",
+      "code": "./group.js",
+      "scope": [
+        {
+          "name": "reactForm",
+          "packageName": "@kne/react-form"
+        }
+      ]
     }
   ]
 }
