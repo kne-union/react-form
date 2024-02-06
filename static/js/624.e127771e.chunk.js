@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunk_kne_components_react_form=self.webpackChunk_kne_components_react_form||[]).push([[624],{47624:(e,r,o)=>{o.r(r),o.d(r,{default:()=>c,manifest:()=>a});const c={ReactForm:o(24304).c},a={name:"react-form",version:"2.1.30","open-version":!0,"public-url":"/react-form",modules:[{name:"react-form",dir:"/home/runner/work/react-form/react-form/doc",description:"\u7528\u4e8e\u8868\u5355\u9a8c\u8bc1\u7684react\u7ec4\u4ef6",packageName:"@kne/react-form"}]}}}]);
-//# sourceMappingURL=624.e127771e.chunk.js.map
