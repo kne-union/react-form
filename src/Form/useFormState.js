@@ -14,7 +14,10 @@ const useFormState = props => {
   const fields = useMemo(() => {
     return Object.values(state).map(item => {
       return {
-        field: item.fieldRef, label: item.label, name: item.name, rule: item.rule
+        field: item.fieldRef,
+        label: item.label,
+        name: item.name,
+        rule: item.rule
       };
     });
   }, [state]);
@@ -40,10 +43,21 @@ const useFormState = props => {
     });
     return output;
   }, [state]);
+
+  useMemo(() => {
+    typeof propsRef.current.onFormDataChange === 'function' && propsRef.current.onFormDataChange(formData, isPass);
+  }, [isPass, formData]);
+
   const formDataRef = useRef({});
   formDataRef.current = formData;
   return {
-    fields, isPass, formData, formDataRef, formState: state, formStateRef: formStateRef, setFormState: state => {
+    fields,
+    isPass,
+    formData,
+    formDataRef,
+    formState: state,
+    formStateRef: formStateRef,
+    setFormState: state => {
       formStateRef.current = state;
       setState(state);
     }

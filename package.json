@@ -1,6 +1,6 @@
 {
   "name": "@kne/react-form",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "syntax": {
     "esmodules": true
   },
